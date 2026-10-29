@@ -1,1 +1,29 @@
-
+{
+  "name": "Ahmed J.",
+  "username": "ahmedday",
+  "password": "Aymane@2011",
+  "goal": "semi_kettlebell",
+  "completedWorkouts": {
+    "Lundi": true,
+    "Mardi": true,
+    "Mercredi": false,
+    "Jeudi": false,
+    "Vendredi": false,
+    "Samedi": false,
+    "Dimanche": false
+  },
+  "weights": [
+    {
+      "date": "2026-10-15",
+      "weight": 85.5
+    },
+    {
+      "date": "2026-10-22",
+      "weight": 85.8
+    },
+    {
+      "date": "2026-10-29",
+      "weight": 85.2
+    }
+  ]
+}
