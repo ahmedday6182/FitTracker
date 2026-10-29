@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTracker - Semi 1h35 & Kettlebell</title>
+    <!-- Tailwind CSS pour un design moderne -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                        accent: '#38bdf8',
+                        accenthover: '#0ea5e9'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="bg-darkbg text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <!-- En-tête -->
+    <header class="bg-cardbg border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-accent text-darkbg font-extrabold p-2 rounded-xl text-lg shadow-lg">
+                    <i class="fa-solid fa-dumbbell"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-wide text-white">FitTracker</h1>
+                    <p class="text-xs text-slate-400">Objectif Semi 1h35 & Kettlebell</p>
+                </div>
+            </div>
+            <!-- Badge synchro GitHub automatique -->
+            <div id="sync-status" class="flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-700 text-xs">
+                <span id="sync-dot" class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                <span id="sync-text" class="text-slate-300 font-medium">Non configuré</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenu Principal -->
+    <main class="max-w-4xl mx-auto px-4 py-6 flex-1 w-full pb-24">
+
+        <!-- ONGLET 1 : DASHBOARD -->
+        <section id="tab-dashboard" class="tab-content active space-y-6">
+            <!-- Carte Objectif -->
+            <div class="bg-gradient-to-r from-sky-900/50 to-blue-900/50 border border-sky-500/30 rounded-2xl p-5 shadow-xl">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-lg font-bold text-sky-200 flex items-center gap-2">
+                        <i class="fa-solid fa-bullseye text-accent"></i> Objectifs Actifs
+                    </h2>
+                    <span class="bg-sky-500/20 text-sky-300 text-xs px-2.5 py-1 rounded-full font-semibold">Semaine en cours</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div class="bg-cardbg/80 p-3.5 rounded-xl border border-slate-700/50">
+                        <div class="text-slate-400 text-xs uppercase tracking-wider font-medium">Running</div>
+                        <div class="font-bold text-white text-base mt-1">Semi-Marathon en 1h35</div>
+                        <div class="text-xs text-accent mt-0.5">Allure cible : 4'30"/km</div>
+                    </div>
+                    <div class="bg-cardbg/80 p-3.5 rounded-xl border border-slate-700/50">
+                        <div class="text-slate-400 text-xs uppercase tracking-wider font-medium">Physique</div>
+                        <div class="font-bold text-white text-base mt-1">Haut du corps tracé & Abdos</div>
+                        <div class="text-xs text-accent mt-0.5">Kettlebell + Haltères + Barre fixe</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistiques rapides -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="bg-cardbg p-4 rounded-xl border border-slate-800 text-center">
+                    <div class="text-slate-400 text-xs">Séances Muscu</div>
+                    <div id="stat-muscu" class="text-2xl font-black text-white mt-1">0 / 4</div>
+                </div>
+                <div class="bg-cardbg p-4 rounded-xl border border-slate-800 text-center">
+                    <div class="text-slate-400 text-xs">Sorties Run</div>
+                    <div id="stat-run" class="text-2xl font-black text-white mt-1">0 / 2</div>
+                </div>
+                <div class="bg-cardbg p-4 rounded-xl border border-slate-800 text-center">
+                    <div class="text-slate-400 text-xs">Poids Actuel</div>
+                    <div id="stat-weight" class="text-2xl font-black text-accent mt-1">-- kg</div>
+                </div>
+                <div class="bg-cardbg p-4 rounded-xl border border-slate-800 text-center">
+                    <div class="text-slate-400 text-xs">Jours OFF</div>
+                    <div class="text-2xl font-black text-emerald-400 mt-1">Samedi</div>
+                </div>
+            </div>
+
+            <!-- Actions Rapides & Timer -->
+            <div class="bg-cardbg border border-slate-800 rounded-2xl p-5">
+                <h3 class="font-bold text-base mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-stopwatch text-accent"></i> Chrono & Minuteur de Repos
+                </h3>
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/80 p-4 rounded-xl border border-slate-700/60">
+                    <div class="text-3xl font-mono font-black text-white tracking-widest" id="timer-display">00:00</div>
+                    <div class="flex flex-wrap gap-2 justify-center">
+                        <button onclick="startTimer(30)" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg font-medium border border-slate-600 transition">+30s</button>
+                        <button onclick="startTimer(60)" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg font-medium border border-slate-600 transition">+60s</button>
+                        <button onclick="startTimer(90)" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg font-medium border border-slate-600 transition">+90s</button>
+                        <button onclick="resetTimer()" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs px-3 py-2 rounded-lg font-medium border border-rose-500/30 transition">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ONGLET 2 : PROGRAMME 7 JOURS -->
+        <section id="tab-program" class="tab-content space-y-4">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-lg font-bold">Programme Hebdomadaire</h2>
+                <button onclick="resetWeekProgress()" class="text-xs text-rose-400 hover:underline">Réinitialiser les cases</button>
+            </div>
+
+            <div id="program-container" class="space-y-3">
+                <!-- Généré dynamiquement en JS -->
+            </div>
+        </section>
+
+        <!-- ONGLET 3 : SUIVI DU POIDS -->
+        <section id="tab-weight" class="tab-content space-y-6">
+            <div class="bg-cardbg border border-slate-800 rounded-2xl p-5">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-scale-balanced text-accent"></i> Suivi du Poids (kg)
+                </h2>
+                
+                <form id="weight-form" class="flex gap-3 mb-6">
+                    <input type="number" step="0.1" id="weight-input" placeholder="Ex: 73.5" required
+                        class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white flex-1 focus:outline-none focus:border-accent">
+                    <button type="submit" class="bg-accent hover:bg-accenthover text-darkbg font-bold px-5 py-2.5 rounded-xl transition">
+                        Ajouter
+                    </button>
+                </form>
+
+                <div class="h-48 w-full bg-slate-900/60 rounded-xl border border-slate-800 flex items-center justify-center p-2 relative overflow-hidden">
+                    <canvas id="weight-chart" class="w-full h-full"></canvas>
+                </div>
+            </div>
+
+            <!-- Historique des pesées -->
+            <div class="bg-cardbg border border-slate-800 rounded-2xl p-5">
+                <h3 class="font-bold text-sm text-slate-400 uppercase tracking-wider mb-3">Historique</h3>
+                <div id="weight-history" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <!-- Liste des pesées injectée ici -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ONGLET 4 : CONFIG GITHUB CLOUD -->
+        <section id="tab-settings" class="tab-content space-y-6">
+            <div class="bg-cardbg border border-slate-800 rounded-2xl p-5 space-y-4">
+                <h2 class="text-lg font-bold flex items-center gap-2">
+                    <i class="fa-brands fa-github text-accent"></i> Synchronisation GitHub Cloud
+                </h2>
+                <p class="text-sm text-slate-400">
+                    FitTracker sauvegarde automatiquement tes données (progression, poids, exercices) sur ton dépôt GitHub privé. Entre tes identifiants ci-dessous :
+                </p>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Token d'accès personnel (Personal Access Token)</label>
+                        <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-accent">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Nom du dépôt (ex: ton-pseudo/fittracker-data)</label>
+                        <input type="text" id="gh-repo" placeholder="username/repo-name" 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-accent">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Chemin du fichier JSON dans le dépôt</label>
+                        <input type="text" id="gh-path" value="data.json" 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-accent">
+                    </div>
+                    <button onclick="saveGitHubConfig()" class="w-full bg-accent hover:bg-accenthover text-darkbg font-bold py-3 rounded-xl transition shadow-lg">
+                        Enregistrer & Lancer la synchronisation
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Barre de Navigation Inférieure -->
+    <nav class="bg-cardbg border-t border-slate-800 fixed bottom-0 left-0 right-0 z-50">
+        <div class="max-w-4xl mx-auto flex justify-around py-3">
+            <button onclick="switchTab('dashboard')" class="nav-btn flex flex-col items-center text-accent" data-target="dashboard">
+                <i class="fa-solid fa-chart-pie text-lg"></i>
+                <span class="text-[10px] mt-1 font-medium">Accueil</span>
+            </button>
+            <button onclick="switchTab('program')" class="nav-btn flex flex-col items-center text-slate-400 hover:text-slate-200" data-target="program">
+                <i class="fa-solid fa-calendar-days text-lg"></i>
+                <span class="text-[10px] mt-1 font-medium">Programme</span>
+            </button>
+            <button onclick="switchTab('weight')" class="nav-btn flex flex-col items-center text-slate-400 hover:text-slate-200" data-target="weight">
+                <i class="fa-solid fa-scale-balanced text-lg"></i>
+                <span class="text-[10px] mt-1 font-medium">Poids</span>
+            </button>
+            <button onclick="switchTab('settings')" class="nav-btn flex flex-col items-center text-slate-400 hover:text-slate-200" data-target="settings">
+                <i class="fa-solid fa-cloud text-lg"></i>
+                <span class="text-[10px] mt-1 font-medium">Cloud</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Script Application & GitHub Auto-Sync -->
+    <script>
+        // Programme complet structuré
+        const programData = [
+            { day: 'Lundi', title: 'Haut du corps (Poussée & Circuit)', type: 'muscu', details: [
+                'Floor Press au Kettlebell (4 x 10 reps)',
+                'Développé Militaire au Kettlebell (3 x 8-10 reps/bras)',
+                'Élévations latérales haltères (3 x 12-15 reps)',
+                'Circuit Kettlebell (3 tours) : 10 Dév. militaires, 12 Pompes sur poignées, 15 Russian Twists, 45s Gainage'
+            ]},
+            { day: 'Mardi', title: 'Course à pied — Vitesse & Allure Semi', type: 'run', details: [
+                'Objectif 1h35 (4\'30"/km)',
+                'Échauffement : 15 min footing + gammes',
+                'Blocs : 3 x 2000m à 4\'30"/km (ou VMA 400m / 800m selon la semaine)',
+                'Retour au calme : 10 min footing lent'
+            ]},
+            { day: 'Mercredi', title: 'Bas du corps — Chaîne Postérieure', type: 'muscu', details: [
+                'Kettlebell Swings (4 x 15-20 reps)',
+                'Goblet Squat au Kettlebell (4 x 12 reps)',
+                'Soulevé de terre roumain Kettlebell (3 x 12 reps)',
+                'Fentes avec Kettlebell (3 x 10 pas/jambe)',
+                'Mollets debout (3 x 20 reps/jambe)'
+            ]},
+            { day: 'Jeudi', title: 'Course à pied — Endurance / Seuil', type: 'run', details: [
+                'Option A : 45-50 min endurance pure (allure 5\'20" - 5\'45"/km)',
+                'Option B : 15 min échauffement + 3 x 6 min au seuil doux (~4\'35"/km) + récup'
+            ]},
+            { day: 'Vendredi', title: 'Haut du corps (Tirage & Circuit)', type: 'muscu', details: [
+                'Tractions sur barre fixe (4 x 8-10 reps)',
+                'Rowing un bras au Kettlebell (3 x 10 reps/bras)',
+                'Kettlebell High Pull (3 x 10 reps)',
+                'Curl Biceps au Kettlebell (3 x 12 reps)',
+                'Circuit Kettlebell (3 tours) : 12 Dead Bugs, 30s Planche latérale, 10 Sit-ups'
+            ]},
+            { day: 'Samedi', title: 'Repos Total (OFF)', type: 'off', details: [
+                'Récupération physique et mentale absolue'
+            ]},
+            { day: 'Dimanche', title: 'Bas du corps — Stabilité & Unilatéral', type: 'muscu', details: [
+                'Squat bulgare (3 x 10 reps/jambe)',
+                'Soulevé de terre roumain unilatéral (3 x 8 reps/jambe)',
+                'Goblet Squat Pulsé (3 x 10 reps)',
+                'Gainage Hollow Body (3 x 30-45s)'
+            ]}
+        ];
+
+        // État de l'application
+        let appState = {
+            completedWorkouts: {}, // {'Lundi': true, ...}
+            weights: [], // [{date: '2026-06-01', weight: 73.5}]
+            settings: { token: '', repo: '', path: 'data.json' }
+        };
+
+        let timerInterval = null;
+        let timeLeft = 0;
+        let autoSaveTimeout = null;
+
+        // Initialisation
+        window.addEventListener('DOMContentLoaded', () => {
+            loadLocalState();
+            renderProgram();
+            updateDashboardStats();
+            renderWeightHistory();
+            drawWeightChart();
+            
+            // Charger les champs de configuration GitHub si enregistrés
+            if(appState.settings.token) document.getElementById('gh-token').value = appState.settings.token;
+            if(appState.settings.repo) document.getElementById('gh-repo').value = appState.settings.repo;
+            if(appState.settings.path) document.getElementById('gh-path').value = appState.settings.path;
+
+            // Tentative de chargement depuis GitHub au démarrage
+            if(appState.settings.token && appState.settings.repo) {
+                fetchFromGitHub();
+            } else {
+                updateSyncStatus('disconnected', 'Non configuré');
+            }
+        });
+
+        // Navigation entre onglets
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-accent');
+                btn.classList.add('text-slate-400');
+            });
+            document.getElementById('tab-' + tabId).classList.add('active');
+            const activeBtn = document.querySelector(`[data-target="${tabId}"]`);
+            if(activeBtn) {
+                activeBtn.classList.add('text-accent');
+                activeBtn.classList.remove('text-slate-400');
+            }
+            if(tabId === 'weight') drawWeightChart();
+        }
+
+        // Gestion du Programme
+        function renderProgram() {
+            const container = document.getElementById('program-container');
+            container.innerHTML = '';
+            programData.forEach(item => {
+                const isCompleted = appState.completedWorkouts[item.day] || false;
+                const card = document.createElement('div');
+                card.className = `bg-cardbg border rounded-xl p-4 transition ${isCompleted ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-slate-800'}`;
+                
+                let detailsHtml = item.details.map(d => `<li class="text-xs text-slate-300">• ${d}</li>`).join('');
+                
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" ${isCompleted ? 'checked' : ''} onchange="toggleWorkout('${item.day}')"
+                                class="w-5 h-5 accent-accent rounded cursor-pointer">
+                            <div>
+                                <span class="text-xs font-bold text-accent uppercase tracking-wider">${item.day}</span>
+                                <h3 class="font-bold text-white text-sm">${item.title}</h3>
+                            </div>
+                        </div>
+                        <span class="text-xs px-2.5 py-1 rounded-full font-medium ${item.type === 'muscu' ? 'bg-indigo-500/20 text-indigo-300' : item.type === 'run' ? 'bg-sky-500/20 text-sky-300' : 'bg-slate-700 text-slate-300'}">
+                            ${item.type.toUpperCase()}
+                        </span>
+                    </div>
+                    <ul class="space-y-1 pl-8 mt-2">${detailsHtml}</ul>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleWorkout(day) {
+            appState.completedWorkouts[day] = !appState.completedWorkouts[day];
+            renderProgram();
+            updateDashboardStats();
+            triggerAutoSave();
+        }
+
+        function resetWeekProgress() {
+            if(confirm("Réinitialiser les cases cochées de la semaine ?")) {
+                appState.completedWorkouts = {};
+                renderProgram();
+                updateDashboardStats();
+                triggerAutoSave();
+            }
+        }
+
+        function updateDashboardStats() {
+            let muscuCount = 0;
+            let runCount = 0;
+            programData.forEach(item => {
+                if(appState.completedWorkouts[item.day]) {
+                    if(item.type === 'muscu') muscuCount++;
+                    if(item.type === 'run') runCount++;
+                }
+            });
+            document.getElementById('stat-muscu').innerText = `${muscuCount} / 4`;
+            document.getElementById('stat-run').innerText = `${runCount} / 2`;
+
+            if(appState.weights.length > 0) {
+                const latest = appState.weights[appState.weights.length - 1];
+                document.getElementById('stat-weight').innerText = latest.weight + ' kg';
+            } else {
+                document.getElementById('stat-weight').innerText = '-- kg';
+            }
+        }
+
+        // Gestion du Poids
+        document.getElementById('weight-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const val = parseFloat(document.getElementById('weight-input').value);
+            if(!isNaN(val)) {
+                const today = new Date().toISOString().split('T')[0];
+                appState.weights.push({ date: today, weight: val });
+                document.getElementById('weight-input').value = '';
+                renderWeightHistory();
+                drawWeightChart();
+                updateDashboardStats();
+                triggerAutoSave();
+            }
+        });
+
+        function renderWeightHistory() {
+            const container = document.getElementById('weight-history');
+            container.innerHTML = '';
+            if(appState.weights.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-500 text-center py-2">Aucune pesée enregistrée</p>';
+                return;
+            }
+            [...appState.weights].reverse().forEach((w, index) => {
+                const realIndex = appState.weights.length - 1 - index;
+                const row = document.createElement('div');
+                row.className = 'flex justify-between items-center bg-slate-900/60 px-3 py-2 rounded-lg text-sm border border-slate-800';
+                row.innerHTML = `
+                    <span class="text-slate-400 text-xs">${w.date}</span>
+                    <span class="font-bold text-white">${w.weight} kg</span>
+                    <button onclick="deleteWeight(${realIndex})" class="text-rose-400 hover:text-rose-300 text-xs"><i class="fa-solid fa-trash"></i></button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function deleteWeight(index) {
+            appState.weights.splice(index, 1);
+            renderWeightHistory();
+            drawWeightChart();
+            updateDashboardStats();
+            triggerAutoSave();
+        }
+
+        function drawWeightChart() {
+            const canvas = document.getElementById('weight-chart');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if(appState.weights.length < 2) {
+                ctx.fillStyle = '#64748b';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Ajoute au moins 2 pesées pour voir la courbe', canvas.width/2, canvas.height/2);
+                return;
+            }
+
+            const weights = appState.weights.map(w => w.weight);
+            const minW = Math.min(...weights) - 1;
+            const maxW = Math.max(...weights) + 1;
+            const padding = 30;
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+
+            appState.weights.forEach((item, i) => {
+                const x = padding + (i / (appState.weights.length - 1)) * (w - 2 * padding);
+                const y = h - padding - ((item.weight - minW) / (maxW - minW)) * (h - 2 * padding);
+                if(i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            // Points
+            appState.weights.forEach((item, i) => {
+                const x = padding + (i / (appState.weights.length - 1)) * (w - 2 * padding);
+                const y = h - padding - ((item.weight - minW) / (maxW - minW)) * (h - 2 * padding);
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+        }
+
+        // Chrono / Timer
+        function startTimer(seconds) {
+            clearInterval(timerInterval);
+            timeLeft = seconds;
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if(timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Fin du temps de repos ! À toi de jouer.");
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 0;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+            const sec = String(timeLeft % 60).padStart(2, '0');
+            document.getElementById('timer-display').innerText = `${min}:${sec}`;
+        }
+
+        // Sauvegarde Locale
+        function loadLocalState() {
+            const saved = localStorage.getItem('fittracker_state');
+            if(saved) {
+                try {
+                    appState = JSON.parse(saved);
+                } catch(e) {}
+            }
+        }
+
+        function saveLocalState() {
+            localStorage.setItem('fittracker_state', JSON.stringify(appState));
+        }
+
+        // Synchronisation GitHub 100% Automatique
+        function saveGitHubConfig() {
+            appState.settings.token = document.getElementById('gh-token').value.trim();
+            appState.settings.repo = document.getElementById('gh-repo').value.trim();
+            appState.settings.path = document.getElementById('gh-path').value.trim() || 'data.json';
+            saveLocalState();
+            fetchFromGitHub();
+        }
+
+        function updateSyncStatus(status, text) {
+            const dot = document.getElementById('sync-dot');
+            const txt = document.getElementById('sync-text');
+            txt.innerText = text;
+            dot.className = "w-2.5 h-2.5 rounded-full animate-pulse ";
+            if(status === 'synced') dot.classList.add('bg-emerald-500');
+            else if(status === 'saving') dot.classList.add('bg-amber-500');
+            else if(status === 'error') dot.classList.add('bg-rose-500');
+            else dot.classList.add('bg-slate-500');
+        }
+
+        function triggerAutoSave() {
+            saveLocalState();
+            if(!appState.settings.token || !appState.settings.repo) return;
+            
+            clearTimeout(autoSaveTimeout);
+            updateSyncStatus('saving', 'Sauvegarde...');
+            autoSaveTimeout = setTimeout(() => {
+                pushToGitHub();
+            }, 1500); // Debounce de 1.5s
+        }
+
+        async function fetchFromGitHub() {
+            const { token, repo, path } = appState.settings;
+            if(!token || !repo) return;
+
+            updateSyncStatus('saving', 'Chargement Cloud...');
+            try {
+                const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+                if(res.ok) {
+                    const data = await res.json();
+                    const jsonContent = JSON.parse(atob(data.content));
+                    appState.completedWorkouts = jsonContent.completedWorkouts || {};
+                    appState.weights = jsonContent.weights || [];
+                    saveLocalState();
+                    renderProgram();
+                    updateDashboardStats();
+                    renderWeightHistory();
+                    drawWeightChart();
+                    updateSyncStatus('synced', 'Synchronisé');
+                } else {
+                    // Fichier inexistant, on le crée
+                    pushToGitHub();
+                }
+            } catch(e) {
+                updateSyncStatus('error', 'Erreur synchro');
+            }
+        }
+
+        async function pushToGitHub() {
+            const { token, repo, path } = appState.settings;
+            if(!token || !repo) return;
+
+            try {
+                // Récupérer le SHA actuel du fichier s'il existe
+                let sha = null;
+                const getRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+                if(getRes.ok) {
+                    const fileData = await getRes.json();
+                    sha = fileData.sha;
+                }
+
+                const contentB64 = btoa(unescape(encodeURIComponent(JSON.stringify({
+                    completedWorkouts: appState.completedWorkouts,
+                    weights: appState.weights
+                }, null, 2))));
+
+                const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'FitTracker Auto-Sync',
+                        content: contentB64,
+                        sha: sha
+                    })
+                });
+
+                if(putRes.ok) {
+                    updateSyncStatus('synced', 'Synchronisé');
+                } else {
+                    updateSyncStatus('error', 'Échec push');
+                }
+            } catch(e) {
+                updateSyncStatus('error', 'Erreur réseau');
+            }
+        }
+    </script>
+</body>
+</html>
