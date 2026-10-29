@@ -94,22 +94,6 @@
                     <div class="text-2xl font-black text-emerald-400 mt-1">Samedi</div>
                 </div>
             </div>
-
-            <!-- Chrono Libre & Minuteur de Repos -->
-            <div class="bg-cardbg border border-slate-800 rounded-2xl p-5">
-                <h3 class="font-bold text-base mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-stopwatch text-accent"></i> Minuteur Rapide
-                </h3>
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/80 p-4 rounded-xl border border-slate-700/60">
-                    <div class="text-3xl font-mono font-black text-white tracking-widest" id="timer-display">00:00</div>
-                    <div class="flex flex-wrap gap-2 justify-center">
-                        <button onclick="startTimer(30)" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg font-medium border border-slate-600 transition">+30s</button>
-                        <button onclick="startTimer(60)" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg font-medium border border-slate-600 transition">+60s</button>
-                        <button onclick="startTimer(90)" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg font-medium border border-slate-600 transition">+90s</button>
-                        <button onclick="resetTimer()" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs px-3 py-2 rounded-lg font-medium border border-rose-500/30 transition">Reset</button>
-                    </div>
-                </div>
-            </div>
         </section>
 
         <!-- ONGLET 2 : PROGRAMME 7 JOURS -->
@@ -292,7 +276,7 @@
         ];
 
         let appState = { completedWorkouts: {}, weights: [], settings: { token: '', repo: '', path: 'data.json' } };
-        let timerInterval = null, timeLeft = 0, autoSaveTimeout = null;
+        let autoSaveTimeout = null;
         let currentWorkout = null, currentExIndex = 0, currentSet = 1, totalSets = 4;
         let workoutRestInterval = null, workoutRestTimeLeft = 0;
 
@@ -502,24 +486,6 @@
                 if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             });
             ctx.stroke();
-        }
-
-        function startTimer(seconds) {
-            clearInterval(timerInterval);
-            timeLeft = seconds;
-            updateTimerDisplay();
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay();
-                if(timeLeft <= 0) { clearInterval(timerInterval); playBeep(); }
-            }, 1000);
-        }
-
-        function resetTimer() { clearInterval(timerInterval); timeLeft = 0; updateTimerDisplay(); }
-        function updateTimerDisplay() {
-            const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
-            const sec = String(timeLeft % 60).padStart(2, '0');
-            document.getElementById('timer-display').innerText = `${min}:${sec}`;
         }
 
         function loadLocalState() {
