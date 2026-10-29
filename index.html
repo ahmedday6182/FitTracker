@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FitTracker - Connexion & Profils Sécurisés</title>
-    <!-- Tailwind CSS -->
+    <title>FitTracker - Multi-Dossiers Profiles</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -20,7 +19,6 @@
             }
         }
     </script>
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .tab-content { display: none; }
@@ -31,7 +29,7 @@
 </head>
 <body class="bg-darkbg text-slate-100 min-h-screen flex flex-col font-sans">
 
-    <!-- VUE 1 : ÉCRAN DE CONNEXION -->
+    <!-- ÉCRAN DE CONNEXION -->
     <div id="auth-view" class="view-section active fixed inset-0 bg-darkbg z-50 flex items-center justify-center p-4">
         <div class="max-w-md w-full bg-cardbg border border-slate-800 rounded-2xl p-8 space-y-6 shadow-2xl">
             <div class="text-center space-y-2">
@@ -39,7 +37,7 @@
                     <i class="fa-solid fa-dumbbell"></i>
                 </div>
                 <h1 class="text-2xl font-black text-white tracking-wide">FitTracker</h1>
-                <p class="text-xs text-slate-400">Connecte-toi pour accéder à ton profil sportif</p>
+                <p class="text-xs text-slate-400">Stockage : <code class="text-accent">profiles/&lt;user&gt;/data.json</code></p>
             </div>
 
             <form id="login-form" class="space-y-4" onsubmit="handleLogin(event)">
@@ -54,21 +52,20 @@
                         class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-accent">
                 </div>
                 <button type="submit" class="w-full bg-accent hover:bg-accenthover text-darkbg font-extrabold py-3.5 rounded-xl transition shadow-lg text-sm">
-                    Se connecter
+                    Se connecter au profil
                 </button>
             </form>
 
             <div class="border-t border-slate-800 pt-4 text-center">
                 <button onclick="openRegisterModal()" class="text-xs text-accent hover:underline font-semibold">
-                    Créer un nouveau profil / compte
+                    Créer un nouveau profil (sous-dossier dédié)
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- VUE 2 : APPLICATION PRINCIPALE -->
+    <!-- APPLICATION PRINCIPALE -->
     <div id="app-view" class="view-section flex-col min-h-screen">
-        <!-- En-tête -->
         <header class="bg-cardbg border-b border-slate-800 sticky top-0 z-40">
             <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
                 <div class="flex items-center space-x-3">
@@ -81,9 +78,6 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="openRegisterModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition">
-                        <i class="fa-solid fa-user-plus mr-1"></i> Nouveau profil
-                    </button>
                     <button onclick="logout()" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs px-3 py-1.5 rounded-lg border border-rose-500/30 transition">
                         <i class="fa-solid fa-right-from-bracket mr-1"></i> Déconnexion
                     </button>
@@ -91,7 +85,6 @@
             </div>
         </header>
 
-        <!-- Contenu Principal -->
         <main class="max-w-4xl mx-auto px-4 py-6 flex-1 w-full pb-24">
             <!-- DASHBOARD -->
             <section id="tab-dashboard" class="tab-content active space-y-6">
@@ -109,14 +102,13 @@
                             <div id="profile-goal-sub" class="text-xs text-accent mt-0.5">Allure cible : 4'30"/km + Kettlebell</div>
                         </div>
                         <div class="bg-cardbg/80 p-3.5 rounded-xl border border-slate-700/50">
-                            <div class="text-slate-400 text-xs uppercase tracking-wider font-medium">Équipement & Style</div>
-                            <div class="font-bold text-white text-base mt-1">Home Gym / Kettlebell</div>
-                            <div class="text-xs text-accent mt-0.5">Muscu ciblée & Cardio intégré</div>
+                            <div class="text-slate-400 text-xs uppercase tracking-wider font-medium">Répertoire GitHub</div>
+                            <div id="profile-file-path" class="font-bold text-emerald-400 text-sm mt-1 font-mono">profiles/admin/data.json</div>
+                            <div class="text-xs text-slate-400 mt-0.5">Sous-dossier unique par profil</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Statistiques -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div class="bg-cardbg p-4 rounded-xl border border-slate-800 text-center">
                         <div class="text-slate-400 text-xs">Séances Muscu</div>
@@ -146,7 +138,7 @@
                 <div id="program-container" class="space-y-3"></div>
             </section>
 
-            <!-- SUIVI DU POIDS -->
+            <!-- SUIVI POIDS -->
             <section id="tab-weight" class="tab-content space-y-6">
                 <div class="bg-cardbg border border-slate-800 rounded-2xl p-5">
                     <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
@@ -155,9 +147,7 @@
                     <form id="weight-form" class="flex gap-3 mb-6">
                         <input type="number" step="0.1" id="weight-input" placeholder="Ex: 73.5" required
                             class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white flex-1 focus:outline-none focus:border-accent">
-                        <button type="submit" class="bg-accent hover:bg-accenthover text-darkbg font-bold px-5 py-2.5 rounded-xl transition">
-                            Ajouter
-                        </button>
+                        <button type="submit" class="bg-accent hover:bg-accenthover text-darkbg font-bold px-5 py-2.5 rounded-xl transition">Ajouter</button>
                     </form>
                     <div class="h-48 w-full bg-slate-900/60 rounded-xl border border-slate-800 flex items-center justify-center p-2 relative overflow-hidden">
                         <canvas id="weight-chart" class="w-full h-full"></canvas>
@@ -169,15 +159,12 @@
                 </div>
             </section>
 
-            <!-- CONFIG GITHUB CLOUD -->
+            <!-- CONFIG GITHUB -->
             <section id="tab-settings" class="tab-content space-y-6">
                 <div class="bg-cardbg border border-slate-800 rounded-2xl p-5 space-y-4">
                     <h2 class="text-lg font-bold flex items-center gap-2">
-                        <i class="fa-brands fa-github text-accent"></i> Synchronisation GitHub Cloud
+                        <i class="fa-brands fa-github text-accent"></i> Configuration GitHub Cloud
                     </h2>
-                    <p class="text-sm text-slate-400">
-                        Sauvegarde tous les profils et comptes utilisateurs sur ton dépôt GitHub privé.
-                    </p>
                     <div class="space-y-3">
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Token d'accès personnel (Personal Access Token)</label>
@@ -185,61 +172,50 @@
                                 class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-accent">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Nom du dépôt (ex: username/fittracker-data)</label>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Nom du dépôt (ex: username/fittracker)</label>
                             <input type="text" id="gh-repo" placeholder="username/repo-name" 
                                 class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-accent">
                         </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Chemin du fichier JSON</label>
-                            <input type="text" id="gh-path" value="data.json" 
-                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-accent">
-                        </div>
                         <button onclick="saveGitHubConfig()" class="w-full bg-accent hover:bg-accenthover text-darkbg font-bold py-3 rounded-xl transition shadow-lg">
-                            Enregistrer & Synchroniser
+                            Enregistrer la configuration GitHub
                         </button>
                     </div>
                 </div>
             </section>
         </main>
 
-        <!-- Barre de Navigation Inférieure -->
         <nav class="bg-cardbg border-t border-slate-800 fixed bottom-0 left-0 right-0 z-40">
             <div class="max-w-4xl mx-auto flex justify-around py-3">
                 <button onclick="switchTab('dashboard')" class="nav-btn flex flex-col items-center text-accent" data-target="dashboard">
-                    <i class="fa-solid fa-chart-pie text-lg"></i>
-                    <span class="text-[10px] mt-1 font-medium">Accueil</span>
+                    <i class="fa-solid fa-chart-pie text-lg"></i><span class="text-[10px] mt-1 font-medium">Accueil</span>
                 </button>
                 <button onclick="switchTab('program')" class="nav-btn flex flex-col items-center text-slate-400 hover:text-slate-200" data-target="program">
-                    <i class="fa-solid fa-calendar-days text-lg"></i>
-                    <span class="text-[10px] mt-1 font-medium">Programme</span>
+                    <i class="fa-solid fa-calendar-days text-lg"></i><span class="text-[10px] mt-1 font-medium">Programme</span>
                 </button>
                 <button onclick="switchTab('weight')" class="nav-btn flex flex-col items-center text-slate-400 hover:text-slate-200" data-target="weight">
-                    <i class="fa-solid fa-scale-balanced text-lg"></i>
-                    <span class="text-[10px] mt-1 font-medium">Poids</span>
+                    <i class="fa-solid fa-scale-balanced text-lg"></i><span class="text-[10px] mt-1 font-medium">Poids</span>
                 </button>
                 <button onclick="switchTab('settings')" class="nav-btn flex flex-col items-center text-slate-400 hover:text-slate-200" data-target="settings">
-                    <i class="fa-solid fa-cloud text-lg"></i>
-                    <span class="text-[10px] mt-1 font-medium">Cloud</span>
+                    <i class="fa-solid fa-cloud text-lg"></i><span class="text-[10px] mt-1 font-medium">Cloud</span>
                 </button>
             </div>
         </nav>
     </div>
 
-    <!-- MODAL CRÉATION DE COMPTE / PROFIL -->
+    <!-- MODAL CRÉATION DE PROFIL -->
     <div id="register-modal" class="fixed inset-0 bg-darkbg/95 z-50 hidden flex flex-col p-4 overflow-y-auto">
         <div class="max-w-md mx-auto w-full bg-cardbg border border-slate-800 rounded-2xl p-6 my-auto space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-user-plus text-accent"></i> Créer un profil</h3>
+                <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-user-plus text-accent"></i> Nouveau sous-dossier profil</h3>
                 <button onclick="closeRegisterModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-
             <form id="register-form" class="space-y-3" onsubmit="handleRegister(event)">
                 <div>
-                    <label class="block text-xs text-slate-300 mb-1">Nom du profil / Titre</label>
-                    <input type="text" id="reg-name" placeholder="Ex: Thomas — Semi & Kettlebell" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                    <label class="block text-xs text-slate-300 mb-1">Nom complet / Titre</label>
+                    <input type="text" id="reg-name" placeholder="Ex: Thomas — Semi 1h35" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-300 mb-1">Identifiant (Login)</label>
+                    <label class="block text-xs text-slate-300 mb-1">Identifiant (Sous-dossier: profiles/&lt;login&gt;/data.json)</label>
                     <input type="text" id="reg-user" placeholder="Ex: thomas" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
                 </div>
                 <div>
@@ -247,7 +223,7 @@
                     <input type="password" id="reg-pass" placeholder="••••••••" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-300 mb-1">Objectif / Programme</label>
+                    <label class="block text-xs text-slate-300 mb-1">Programme Cible</label>
                     <select id="reg-goal" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
                         <option value="semi_kettlebell">Semi-Marathon 1h35 & Kettlebell</option>
                         <option value="seche_abdos">Sèche Extrême & Abdos Tracés</option>
@@ -255,55 +231,12 @@
                     </select>
                 </div>
                 <button type="submit" class="w-full bg-accent hover:bg-accenthover text-darkbg font-bold py-2.5 rounded-xl text-sm transition mt-2">
-                    Créer et se connecter
+                    Créer le sous-dossier profil
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL WORKOUT EN DIRECT -->
-    <div id="workout-modal" class="fixed inset-0 bg-darkbg/95 z-50 hidden flex flex-col p-4 overflow-y-auto">
-        <div class="max-w-2xl mx-auto w-full flex-1 flex flex-col space-y-4 my-auto">
-            <div class="flex justify-between items-center bg-cardbg p-4 rounded-2xl border border-slate-800">
-                <div>
-                    <span id="active-workout-day" class="text-xs font-bold text-accent uppercase">LUNDI</span>
-                    <h2 id="active-workout-title" class="text-lg font-bold text-white">Nom de la séance</h2>
-                </div>
-                <button onclick="closeWorkoutMode()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300">Quitter</button>
-            </div>
-
-            <div id="workout-timer-box" class="bg-cardbg border border-slate-800 rounded-2xl p-6 text-center space-y-2 hidden shadow-2xl">
-                <div class="text-xs uppercase tracking-widest text-accent font-bold">Temps de Repos</div>
-                <div id="workout-timer-display" class="text-5xl font-mono font-black text-white tracking-widest">01:30</div>
-                <div class="flex justify-center gap-2 pt-2">
-                    <button onclick="addRestTime(30)" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded-lg">+30s</button>
-                    <button onclick="skipRest()" class="bg-accent/20 hover:bg-accent/30 text-accent text-xs px-3 py-1.5 rounded-lg font-semibold">Passer</button>
-                </div>
-            </div>
-
-            <div id="exercise-card" class="bg-cardbg border border-slate-800 rounded-2xl p-6 space-y-6 flex-1 flex flex-col justify-between">
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center text-xs text-slate-400 font-semibold">
-                        <span id="exercise-counter">Exercice 1</span>
-                        <span id="set-counter" class="bg-slate-800 px-2.5 py-1 rounded-full text-accent">Série 1 / 4</span>
-                    </div>
-                    <h3 id="exercise-name" class="text-xl font-bold text-white">Nom</h3>
-                    <p id="exercise-desc" class="text-sm text-slate-300 bg-slate-900/60 p-3.5 rounded-xl border border-slate-800/80">Instructions...</p>
-                </div>
-                <div class="space-y-3 pt-4">
-                    <button onclick="completeSet()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-darkbg font-extrabold py-4 rounded-2xl text-base transition shadow-lg">
-                        <i class="fa-solid fa-check mr-1"></i> Valider la série & Repos (90s)
-                    </button>
-                    <div class="flex gap-2">
-                        <button onclick="prevExercise()" class="flex-1 bg-slate-800 hover:bg-slate-700 py-3 rounded-xl text-sm font-semibold text-slate-300">Précédent</button>
-                        <button onclick="nextExercise()" class="flex-1 bg-slate-800 hover:bg-slate-700 py-3 rounded-xl text-sm font-semibold text-slate-300">Suivant</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Script Application -->
     <script>
         const goalTemplates = {
             semi_kettlebell: {
@@ -347,42 +280,95 @@
             }
         };
 
-        let globalState = {
-            activeUser: null,
-            profiles: {
-                'admin': {
-                    name: 'Admin Principal',
-                    username: 'admin',
-                    password: 'password',
-                    goal: 'semi_kettlebell',
-                    completedWorkouts: {},
-                    weights: []
-                }
-            },
-            settings: { token: '', repo: '', path: 'data.json' }
+        let currentProfile = {
+            name: 'Admin Principal',
+            username: 'admin',
+            password: 'password',
+            goal: 'semi_kettlebell',
+            completedWorkouts: {},
+            weights: []
         };
 
+        let config = { token: '', repo: '' };
         let autoSaveTimeout = null;
-        let currentWorkout = null, currentExIndex = 0, currentSet = 1, totalSets = 4;
-        let workoutRestInterval = null, workoutRestTimeLeft = 0;
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            loadLocalState();
-            if(globalState.settings.token) document.getElementById('gh-token').value = globalState.settings.token;
-            if(globalState.settings.repo) document.getElementById('gh-repo').value = globalState.settings.repo;
-            if(globalState.settings.path) document.getElementById('gh-path').value = globalState.settings.path;
+        window.addEventListener('DOMContentLoaded', () => {
+            loadConfig();
+            if(config.token) document.getElementById('gh-token').value = config.token;
+            if(config.repo) document.getElementById('gh-repo').value = config.repo;
+        });
+
+        function loadConfig() {
+            const saved = localStorage.getItem('fittracker_config');
+            if(saved) { try { config = JSON.parse(saved); } catch(e){} }
+        }
+        function saveGitHubConfig() {
+            config.token = document.getElementById('gh-token').value.trim();
+            config.repo = document.getElementById('gh-repo').value.trim();
+            localStorage.setItem('fittracker_config', JSON.stringify(config));
+            alert("Configuration GitHub enregistrée !");
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('login-user').value.trim().toLowerCase();
+            const pass = document.getElementById('login-pass').value.trim();
+
+            // 1. Recherche dans profiles/<user>/data.json
+            let loaded = await fetchProfileFromGitHub(user);
             
-            // Charger depuis GitHub en priorité au démarrage (avec fusion)
-            if(globalState.settings.token && globalState.settings.repo) {
-                await fetchFromGitHub();
+            // 2. Fallback stockage local
+            if(!loaded) {
+                const localSaved = localStorage.getItem(`fittracker_prof_${user}`);
+                if(localSaved) {
+                    try { loaded = JSON.parse(localSaved); } catch(err){}
+                }
             }
 
-            if(globalState.activeUser && globalState.profiles[globalState.activeUser]) {
+            // 3. Fallback profil admin par défaut
+            if(!loaded && user === 'admin' && pass === 'password') {
+                loaded = currentProfile;
+            }
+
+            if(loaded && loaded.password === pass) {
+                currentProfile = loaded;
+                saveLocalProfile();
                 showAppView();
             } else {
-                showAuthView();
+                alert(`Impossible de trouver le dossier profiles/${user}/data.json ou mot de passe incorrect.`);
             }
-        });
+        }
+
+        function logout() {
+            showAuthView();
+        }
+
+        function openRegisterModal() { document.getElementById('register-modal').classList.remove('hidden'); }
+        function closeRegisterModal() { document.getElementById('register-modal').classList.add('hidden'); }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const user = document.getElementById('reg-user').value.trim().toLowerCase();
+            const pass = document.getElementById('reg-pass').value.trim();
+            const goal = document.getElementById('reg-goal').value;
+
+            currentProfile = {
+                name: name,
+                username: user,
+                password: pass,
+                goal: goal,
+                completedWorkouts: {},
+                weights: []
+            };
+
+            saveLocalProfile();
+            closeRegisterModal();
+            
+            // Crée automatiquement le dossier profiles/<user>/data.json
+            await pushProfileToGitHub();
+            showAppView();
+        }
 
         function showAuthView() {
             document.getElementById('auth-view').classList.add('active');
@@ -392,77 +378,22 @@
         function showAppView() {
             document.getElementById('auth-view').classList.remove('active');
             document.getElementById('app-view').classList.add('active');
-            loadCurrentProfileData();
+            loadCurrentProfileUI();
         }
 
-        function handleLogin(e) {
-            e.preventDefault();
-            const user = document.getElementById('login-user').value.trim().toLowerCase();
-            const pass = document.getElementById('login-pass').value.trim();
+        function loadCurrentProfileUI() {
+            const template = goalTemplates[currentProfile.goal] || goalTemplates['semi_kettlebell'];
+            document.getElementById('header-profile-name').innerText = currentProfile.name;
+            document.getElementById('header-profile-goal').innerText = template.title;
+            document.getElementById('profile-goal-badge').innerText = template.title.split('&')[0];
+            document.getElementById('profile-goal-title').innerText = template.title;
+            document.getElementById('profile-goal-sub').innerText = template.sub;
+            document.getElementById('profile-file-path').innerText = `profiles/${currentProfile.username}/data.json`;
 
-            let foundId = null;
-            for(let id in globalState.profiles) {
-                if(globalState.profiles[id].username === user && globalState.profiles[id].password === pass) {
-                    foundId = id;
-                    break;
-                }
-            }
-
-            if(foundId) {
-                globalState.activeUser = foundId;
-                saveLocalState();
-                showAppView();
-            } else {
-                alert("Identifiant ou mot de passe incorrect.");
-            }
-        }
-
-        function logout() {
-            globalState.activeUser = null;
-            saveLocalState();
-            showAuthView();
-        }
-
-        function openRegisterModal() { document.getElementById('register-modal').classList.remove('hidden'); }
-        function closeRegisterModal() { document.getElementById('register-modal').classList.add('hidden'); }
-
-        function handleRegister(e) {
-            e.preventDefault();
-            const name = document.getElementById('reg-name').value.trim();
-            const user = document.getElementById('reg-user').value.trim().toLowerCase();
-            const pass = document.getElementById('reg-pass').value.trim();
-            const goal = document.getElementById('reg-goal').value;
-
-            for(let id in globalState.profiles) {
-                if(globalState.profiles[id].username === user) {
-                    return alert("Cet identifiant est déjà pris, choisis-en un autre.");
-                }
-            }
-
-            const newId = 'user_' + Date.now();
-            globalState.profiles[newId] = {
-                name: name,
-                username: user,
-                password: pass,
-                goal: goal,
-                completedWorkouts: {},
-                weights: []
-            };
-
-            globalState.activeUser = newId;
-            saveLocalState();
-            closeRegisterModal();
-            
-            // Sauvegarde immédiate sur GitHub pour sécuriser le nouveau compte
-            pushToGitHub();
-            showAppView();
-        }
-
-        function getActiveProfile() {
-            if(!globalState.profiles[globalState.activeUser]) {
-                globalState.activeUser = 'admin';
-            }
-            return globalState.profiles[globalState.activeUser];
+            renderProgram();
+            updateDashboardStats();
+            renderWeightHistory();
+            drawWeightChart();
         }
 
         function switchTab(tabId) {
@@ -475,36 +406,17 @@
             if(tabId === 'weight') drawWeightChart();
         }
 
-        function loadCurrentProfileData() {
-            const profile = getActiveProfile();
-            const template = goalTemplates[profile.goal] || goalTemplates['semi_kettlebell'];
-            
-            document.getElementById('header-profile-name').innerText = profile.name;
-            document.getElementById('header-profile-goal').innerText = template.title;
-            document.getElementById('profile-goal-badge').innerText = template.title.split('&')[0];
-            document.getElementById('profile-goal-title').innerText = template.title;
-            document.getElementById('profile-goal-sub').innerText = template.sub;
-
-            renderProgram();
-            updateDashboardStats();
-            renderWeightHistory();
-            drawWeightChart();
-        }
-
         function renderProgram() {
-            const profile = getActiveProfile();
-            const template = goalTemplates[profile.goal] || goalTemplates['semi_kettlebell'];
+            const template = goalTemplates[currentProfile.goal] || goalTemplates['semi_kettlebell'];
             const container = document.getElementById('program-container');
             if(!container) return;
             container.innerHTML = '';
 
             template.program.forEach(item => {
-                const isCompleted = profile.completedWorkouts[item.day] || false;
+                const isCompleted = currentProfile.completedWorkouts[item.day] || false;
                 const card = document.createElement('div');
                 card.className = `bg-cardbg border rounded-xl p-4 transition ${isCompleted ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-slate-800'}`;
                 let detailsHtml = item.details.map(d => `<li class="text-xs text-slate-300">• ${d}</li>`).join('');
-                let actionBtn = item.type === 'muscu' ? `<button onclick="startWorkoutMode('${item.day}')" class="bg-accent hover:bg-accenthover text-darkbg font-bold text-xs px-3 py-1.5 rounded-lg transition shadow"><i class="fa-solid fa-play mr-1"></i> Séance</button>` : '';
-                
                 card.innerHTML = `
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center gap-3">
@@ -514,10 +426,7 @@
                                 <h3 class="font-bold text-white text-sm">${item.title}</h3>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            ${actionBtn}
-                            <span class="text-xs px-2.5 py-1 rounded-full font-medium ${item.type === 'muscu' ? 'bg-indigo-500/20 text-indigo-300' : item.type === 'run' ? 'bg-sky-500/20 text-sky-300' : 'bg-slate-700 text-slate-300'}">${item.type.toUpperCase()}</span>
-                        </div>
+                        <span class="text-xs px-2.5 py-1 rounded-full font-medium ${item.type === 'muscu' ? 'bg-indigo-500/20 text-indigo-300' : item.type === 'run' ? 'bg-sky-500/20 text-sky-300' : 'bg-slate-700 text-slate-300'}">${item.type.toUpperCase()}</span>
                     </div>
                     <ul class="space-y-1 pl-8 mt-2">${detailsHtml}</ul>
                 `;
@@ -526,56 +435,52 @@
         }
 
         function toggleWorkout(day) {
-            const profile = getActiveProfile();
-            profile.completedWorkouts[day] = !profile.completedWorkouts[day];
+            currentProfile.completedWorkouts[day] = !currentProfile.completedWorkouts[day];
             renderProgram(); updateDashboardStats(); triggerAutoSave();
         }
 
         function resetWeekProgress() {
-            if(confirm("Réinitialiser les cases de la semaine ?")) {
-                getActiveProfile().completedWorkouts = {};
+            if(confirm("Réinitialiser ?")) {
+                currentProfile.completedWorkouts = {};
                 renderProgram(); updateDashboardStats(); triggerAutoSave();
             }
         }
 
         function updateDashboardStats() {
-            const profile = getActiveProfile();
-            const template = goalTemplates[profile.goal] || goalTemplates['semi_kettlebell'];
+            const template = goalTemplates[currentProfile.goal] || goalTemplates['semi_kettlebell'];
             let muscuCount = 0, runCount = 0;
             template.program.forEach(item => {
-                if(profile.completedWorkouts[item.day]) {
+                if(currentProfile.completedWorkouts[item.day]) {
                     if(item.type === 'muscu') muscuCount++;
                     if(item.type === 'run') runCount++;
                 }
             });
             document.getElementById('stat-muscu').innerText = `${muscuCount} / 4`;
             document.getElementById('stat-run').innerText = `${runCount} / 2`;
-            if(profile.weights.length > 0) {
-                document.getElementById('stat-weight').innerText = profile.weights[profile.weights.length - 1].weight + ' kg';
+            if(currentProfile.weights.length > 0) {
+                document.getElementById('stat-weight').innerText = currentProfile.weights[currentProfile.weights.length - 1].weight + ' kg';
             } else {
                 document.getElementById('stat-weight').innerText = '-- kg';
             }
         }
 
-        // Suivi Poids
         document.getElementById('weight-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const val = parseFloat(document.getElementById('weight-input').value);
             if(!isNaN(val)) {
-                getActiveProfile().weights.push({ date: new Date().toISOString().split('T')[0], weight: val });
+                currentProfile.weights.push({ date: new Date().toISOString().split('T')[0], weight: val });
                 document.getElementById('weight-input').value = '';
                 renderWeightHistory(); drawWeightChart(); updateDashboardStats(); triggerAutoSave();
             }
         });
 
         function renderWeightHistory() {
-            const profile = getActiveProfile();
             const container = document.getElementById('weight-history');
             if(!container) return;
             container.innerHTML = '';
-            if(profile.weights.length === 0) { container.innerHTML = '<p class="text-xs text-slate-500 text-center py-2">Aucune pesée</p>'; return; }
-            [...profile.weights].reverse().forEach((w, index) => {
-                const realIndex = profile.weights.length - 1 - index;
+            if(currentProfile.weights.length === 0) { container.innerHTML = '<p class="text-xs text-slate-500 text-center py-2">Aucune pesée</p>'; return; }
+            [...currentProfile.weights].reverse().forEach((w, index) => {
+                const realIndex = currentProfile.weights.length - 1 - index;
                 const row = document.createElement('div');
                 row.className = 'flex justify-between items-center bg-slate-900/60 px-3 py-2 rounded-lg text-sm border border-slate-800';
                 row.innerHTML = `<span class="text-slate-400 text-xs">${w.date}</span><span class="font-bold text-white">${w.weight} kg</span><button onclick="deleteWeight(${realIndex})" class="text-rose-400 text-xs"><i class="fa-solid fa-trash"></i></button>`;
@@ -584,171 +489,76 @@
         }
 
         function deleteWeight(index) {
-            getActiveProfile().weights.splice(index, 1);
+            currentProfile.weights.splice(index, 1);
             renderWeightHistory(); drawWeightChart(); updateDashboardStats(); triggerAutoSave();
         }
 
         function drawWeightChart() {
-            const profile = getActiveProfile();
             const canvas = document.getElementById('weight-chart');
             if(!canvas || !canvas.parentElement) return;
             const ctx = canvas.getContext('2d');
             canvas.width = canvas.parentElement.clientWidth;
             canvas.height = canvas.parentElement.clientHeight;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if(profile.weights.length < 2) {
+            if(currentProfile.weights.length < 2) {
                 ctx.fillStyle = '#64748b'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
                 ctx.fillText('Ajoute au moins 2 pesées', canvas.width/2, canvas.height/2);
                 return;
             }
-            const weights = profile.weights.map(w => w.weight);
+            const weights = currentProfile.weights.map(w => w.weight);
             const minW = Math.min(...weights) - 1, maxW = Math.max(...weights) + 1;
             const padding = 30, w = canvas.width, h = canvas.height;
             ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2.5; ctx.beginPath();
-            profile.weights.forEach((item, i) => {
-                const x = padding + (i / (profile.weights.length - 1)) * (w - 2 * padding);
+            currentProfile.weights.forEach((item, i) => {
+                const x = padding + (i / (currentProfile.weights.length - 1)) * (w - 2 * padding);
                 const y = h - padding - ((item.weight - minW) / (maxW - minW)) * (h - 2 * padding);
                 if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             });
             ctx.stroke();
         }
 
-        // Mode Workout
-        function startWorkoutMode(dayName) {
-            const profile = getActiveProfile();
-            const template = goalTemplates[profile.goal];
-            currentWorkout = template.program.find(p => p.day === dayName);
-            if(!currentWorkout) return;
-            currentExIndex = 0; currentSet = 1; totalSets = 4;
-            document.getElementById('active-workout-day').innerText = currentWorkout.day;
-            document.getElementById('active-workout-title').innerText = currentWorkout.title;
-            document.getElementById('workout-modal').classList.remove('hidden');
-            clearInterval(workoutRestInterval);
-            document.getElementById('workout-timer-box').classList.add('hidden');
-            updateWorkoutUI();
-        }
-
-        function closeWorkoutMode() { document.getElementById('workout-modal').classList.add('hidden'); clearInterval(workoutRestInterval); }
-
-        function updateWorkoutUI() {
-            const exercises = currentWorkout.details;
-            const currentEx = exercises[currentExIndex] || "Fin";
-            document.getElementById('exercise-counter').innerText = `Exercice ${currentExIndex + 1} / ${exercises.length}`;
-            document.getElementById('set-counter').innerText = `Série ${currentSet} / ${totalSets}`;
-            document.getElementById('exercise-name').innerText = currentEx.split('(')[0].trim();
-            document.getElementById('exercise-desc').innerText = currentEx;
-        }
-
-        function completeSet() {
-            startWorkoutRest(90);
-            if(currentSet < totalSets) { currentSet++; }
-            else {
-                if(currentExIndex < currentWorkout.details.length - 1) { currentExIndex++; currentSet = 1; }
-                else {
-                    alert("Séance terminée ! Bravo !");
-                    getActiveProfile().completedWorkouts[currentWorkout.day] = true;
-                    renderProgram(); updateDashboardStats(); triggerAutoSave(); closeWorkoutMode();
-                    return;
-                }
-            }
-            updateWorkoutUI();
-        }
-
-        function nextExercise() { if(currentExIndex < currentWorkout.details.length - 1) { currentExIndex++; currentSet = 1; updateWorkoutUI(); } }
-        function prevExercise() { if(currentExIndex > 0) { currentExIndex--; currentSet = 1; updateWorkoutUI(); } }
-
-        function startWorkoutRest(seconds) {
-            clearInterval(workoutRestInterval);
-            workoutRestTimeLeft = seconds;
-            const box = document.getElementById('workout-timer-box');
-            box.classList.remove('hidden');
-            updateWorkoutRestDisplay();
-            workoutRestInterval = setInterval(() => {
-                workoutRestTimeLeft--;
-                updateWorkoutRestDisplay();
-                if(workoutRestTimeLeft <= 0) { clearInterval(workoutRestInterval); box.classList.add('hidden'); playBeep(); }
-            }, 1000);
-        }
-
-        function addRestTime(sec) { workoutRestTimeLeft += sec; updateWorkoutRestDisplay(); }
-        function skipRest() { clearInterval(workoutRestInterval); document.getElementById('workout-timer-box').classList.add('hidden'); }
-        function updateWorkoutRestDisplay() {
-            const min = String(Math.floor(workoutRestTimeLeft / 60)).padStart(2, '0');
-            const sec = String(workoutRestTimeLeft % 60).padStart(2, '0');
-            document.getElementById('workout-timer-display').innerText = `${min}:${sec}`;
-        }
-
-        function playBeep() {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator(); const gain = ctx.createGain();
-                osc.type = 'sine'; osc.frequency.value = 800;
-                osc.connect(gain); gain.connect(ctx.destination);
-                osc.start(); setTimeout(() => osc.stop(), 300);
-            } catch(e) {}
-        }
-
-        // Sauvegarde Cloud & Locale (avec fusion intelligente des profils)
-        function loadLocalState() {
-            const saved = localStorage.getItem('fittracker_secure_state');
-            if(saved) { try { globalState = JSON.parse(saved); } catch(e) {} }
-        }
-        function saveLocalState() { localStorage.setItem('fittracker_secure_state', JSON.stringify(globalState)); }
-
-        function saveGitHubConfig() {
-            globalState.settings.token = document.getElementById('gh-token').value.trim();
-            globalState.settings.repo = document.getElementById('gh-repo').value.trim();
-            globalState.settings.path = document.getElementById('gh-path').value.trim() || 'data.json';
-            saveLocalState(); fetchFromGitHub();
+        function saveLocalProfile() {
+            localStorage.setItem(`fittracker_prof_${currentProfile.username}`, JSON.stringify(currentProfile));
         }
 
         function triggerAutoSave() {
-            saveLocalState();
-            if(!globalState.settings.token || !globalState.settings.repo) return;
+            saveLocalProfile();
+            if(!config.token || !config.repo) return;
             clearTimeout(autoSaveTimeout);
-            autoSaveTimeout = setTimeout(() => pushToGitHub(), 1500);
+            autoSaveTimeout = setTimeout(() => pushProfileToGitHub(), 1500);
         }
 
-        async function fetchFromGitHub() {
-            const { token, repo, path } = globalState.settings;
-            if(!token || !repo) return;
+        async function fetchProfileFromGitHub(username) {
+            if(!config.token || !config.repo) return null;
             try {
-                const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
-                    headers: { 'Authorization': `token ${token}` }
+                const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/profiles/${username}/data.json`, {
+                    headers: { 'Authorization': `token ${config.token}` }
                 });
                 if(res.ok) {
                     const data = await res.json();
-                    const remoteState = JSON.parse(atob(data.content));
-                    
-                    // FUSION INTELLIGENTE : On combine les profils distants et locaux pour ne rien perdre
-                    globalState.profiles = { ...remoteState.profiles, ...globalState.profiles };
-                    if(remoteState.settings) globalState.settings = remoteState.settings;
-                    
-                    saveLocalState();
-                    if(globalState.activeUser && globalState.profiles[globalState.activeUser]) {
-                        loadCurrentProfileData();
-                    }
-                } else { pushToGitHub(); }
-            } catch(e) {}
+                    return JSON.parse(atob(data.content));
+                }
+            } catch(e){}
+            return null;
         }
 
-        async function pushToGitHub() {
-            const { token, repo, path } = globalState.settings;
-            if(!token || !repo) return;
+        async function pushProfileToGitHub() {
+            if(!config.token || !config.repo) return;
+            const filePath = `profiles/${currentProfile.username}/data.json`;
             try {
                 let sha = null;
-                const getRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
-                    headers: { 'Authorization': `token ${token}` }
+                const getRes = await fetch(`https://api.github.com/repos/${config.repo}/contents/${filePath}`, {
+                    headers: { 'Authorization': `token ${config.token}` }
                 });
                 if(getRes.ok) { const fileData = await getRes.json(); sha = fileData.sha; }
 
-                const contentB64 = btoa(unescape(encodeURIComponent(JSON.stringify(globalState, null, 2))));
-                await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+                const contentB64 = btoa(unescape(encodeURIComponent(JSON.stringify(currentProfile, null, 2))));
+                await fetch(`https://api.github.com/repos/${config.repo}/contents/${filePath}`, {
                     method: 'PUT',
-                    headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: 'FitTracker Auth Sync', content: contentB64, sha: sha })
+                    headers: { 'Authorization': `token ${config.token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: `FitTracker Update profiles/${currentProfile.username}/data.json`, content: contentB64, sha: sha })
                 });
-            } catch(e) {}
+            } catch(e){}
         }
     </script>
 </body>
