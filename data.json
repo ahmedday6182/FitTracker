@@ -2,5 +2,10 @@
   "completedWorkouts": {
     "Lundi": false
   },
-  "weights": []
+  "weights": [
+    {
+      "date": "2026-10-29",
+      "weight": 85.5
+    }
+  ]
 }
