@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FitTracker - Multi-Profils & Objectifs</title>
+    <title>FitTracker - Connexion & Profils Sécurisés</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -25,180 +25,239 @@
     <style>
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .view-section { display: none; }
+        .view-section.active { display: flex; }
     </style>
 </head>
 <body class="bg-darkbg text-slate-100 min-h-screen flex flex-col font-sans">
 
-    <!-- En-tête -->
-    <header class="bg-cardbg border-b border-slate-800 sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <div class="bg-accent text-darkbg font-extrabold p-2 rounded-xl text-lg shadow-lg">
+    <!-- VUE 1 : ÉCRAN DE CONNEXION (LOGIN / MDP) -->
+    <div id="auth-view" class="view-section active fixed inset-0 bg-darkbg z-50 flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-cardbg border border-slate-800 rounded-2xl p-8 space-y-6 shadow-2xl">
+            <div class="text-center space-y-2">
+                <div class="inline-block bg-accent text-darkbg font-extrabold p-3 rounded-2xl text-2xl shadow-lg">
                     <i class="fa-solid fa-dumbbell"></i>
                 </div>
-                <div>
-                    <h1 class="font-bold text-lg tracking-wide text-white">FitTracker</h1>
-                    <select id="profile-select" onchange="switchProfile(this.value)" class="bg-slate-900 text-xs text-accent font-semibold px-2 py-1 rounded-lg border border-slate-700 mt-0.5 focus:outline-none">
-                        <!-- Profils injectés dynamiquement -->
-                    </select>
-                </div>
+                <h1 class="text-2xl font-black text-white tracking-wide">FitTracker</h1>
+                <p class="text-xs text-slate-400">Connecte-toi pour accéder à ton profil sportif</p>
             </div>
-            <div class="flex items-center gap-3">
-                <button onclick="openProfileModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition">
-                    <i class="fa-solid fa-user-gear mr-1"></i> Gérer profils
-                </button>
-                <div id="sync-status" class="hidden sm:flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-700 text-xs">
-                    <span id="sync-dot" class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                    <span id="sync-text" class="text-slate-300 font-medium">Cloud</span>
+
+            <form id="login-form" class="space-y-4" onsubmit="handleLogin(event)">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Identifiant (Login)</label>
+                    <input type="text" id="login-user" placeholder="Ex: mon_pseudo" required
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-accent">
                 </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Mot de passe</label>
+                    <input type="password" id="login-pass" placeholder="••••••••" required
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-accent">
+                </div>
+                <button type="submit" class="w-full bg-accent hover:bg-accenthover text-darkbg font-extrabold py-3.5 rounded-xl transition shadow-lg text-sm">
+                    Se connecter
+                </button>
+            </form>
+
+            <div class="border-t border-slate-800 pt-4 text-center">
+                <button onclick="openRegisterModal()" class="text-xs text-accent hover:underline font-semibold">
+                    Créer un nouveau profil / compte
+                </button>
             </div>
         </div>
-    </header>
+    </div>
 
-    <!-- Contenu Principal -->
-    <main class="max-w-4xl mx-auto px-4 py-6 flex-1 w-full pb-24">
+    <!-- VUE 2 : APPLICATION PRINCIPALE -->
+    <div id="app-view" class="view-section flex-col min-h-screen">
+        <!-- En-tête -->
+        <header class="bg-cardbg border-b border-slate-800 sticky top-0 z-40">
+            <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-accent text-darkbg font-extrabold p-2 rounded-xl text-lg shadow-lg">
+                        <i class="fa-solid fa-dumbbell"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg tracking-wide text-white" id="header-profile-name">Profil</h1>
+                        <p class="text-xs text-accent font-medium" id="header-profile-goal">Objectif</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="openRegisterModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                        <i class="fa-solid fa-user-plus mr-1"></i> Nouveau profil
+                    </button>
+                    <button onclick="logout()" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs px-3 py-1.5 rounded-lg border border-rose-500/30 transition">
+                        <i class="fa-solid fa-right-from-bracket mr-1"></i> Déconnexion
+                    </button>
+                </div>
+            </div>
+        </header>
 
-        <!-- ONGLET 1 : DASHBOARD -->
-        <section id="tab-dashboard" class="tab-content active space-y-6">
-            <div class="bg-gradient-to-r from-sky-900/50 to-blue-900/50 border border-sky-500/30 rounded-2xl p-5 shadow-xl">
-                <div class="flex items-center justify-between mb-3">
-                    <h2 class="text-lg font-bold text-sky-200 flex items-center gap-2">
-                        <i class="fa-solid fa-bullseye text-accent"></i> Objectif du Profil
+        <!-- Contenu Principal -->
+        <main class="max-w-4xl mx-auto px-4 py-6 flex-1 w-full pb-24">
+            <!-- DASHBOARD -->
+            <section id="tab-dashboard" class="tab-content active space-y-6">
+                <div class="bg-gradient-to-r from-sky-900/50 to-blue-900/50 border border-sky-500/30 rounded-2xl p-5 shadow-xl">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-lg font-bold text-sky-200 flex items-center gap-2">
+                            <i class="fa-solid fa-bullseye text-accent"></i> Objectif du Compte
+                        </h2>
+                        <span id="profile-goal-badge" class="bg-sky-500/20 text-sky-300 text-xs px-2.5 py-1 rounded-full font-semibold">Semi 1h35</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div class="bg-cardbg/80 p-3.5 rounded-xl border border-slate-700/50">
+                            <div class="text-slate-400 text-xs uppercase tracking-wider font-medium">Focus Principal</div>
+                            <div id="profile-goal-title" class="font-bold text-white text-base mt-1">Semi-Marathon en 1h35</div>
+                            <div id="profile-goal-sub" class="text-xs text-accent mt-0.5">Allure cible : 4'30"/km + Kettlebell</div>
+                        </div>
+                        <div class="bg-cardbg/80 p-3.5 rounded-xl border border-slate-700/50">
+                            <div class="text-slate-400 text-xs uppercase tracking-wider font-medium">Équipement & Style</div>
+                            <div class="font-bold text-white text-base mt-1">Home Gym / Kettlebell</div>
+                            <div class="text-xs text-accent mt-0.5">Muscu ciblée & Cardio intégré</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistiques -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="bg-cardbg p-4 rounded-xl border border-slate-800 text-center">
+                        <div class="text-slate-400 text-xs">Séances Muscu</div>
+                        <div id="stat-muscu" class="text-2xl font-black text-white mt-1">0 / 4</div>
+                    </div>
+                    <div class="bg-cardbg p-4 rounded-xl border border-slate-800 text-center">
+                        <div class="text-slate-400 text-xs">Sorties Run</div>
+                        <div id="stat-run" class="text-2xl font-black text-white mt-1">0 / 2</div>
+                    </div>
+                    <div class="bg-cardbg p-4 rounded-xl border border-slate-800 text-center">
+                        <div class="text-slate-400 text-xs">Poids Actuel</div>
+                        <div id="stat-weight" class="text-2xl font-black text-accent mt-1">-- kg</div>
+                    </div>
+                    <div class="bg-cardbg p-4 rounded-xl border border-slate-800 text-center">
+                        <div class="text-slate-400 text-xs">Jours OFF</div>
+                        <div class="text-2xl font-black text-emerald-400 mt-1">Samedi</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROGRAMME 7 JOURS -->
+            <section id="tab-program" class="tab-content space-y-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-lg font-bold">Programme Hebdomadaire</h2>
+                    <button onclick="resetWeekProgress()" class="text-xs text-rose-400 hover:underline">Réinitialiser les cases</button>
+                </div>
+                <div id="program-container" class="space-y-3"></div>
+            </section>
+
+            <!-- SUIVI DU POIDS -->
+            <section id="tab-weight" class="tab-content space-y-6">
+                <div class="bg-cardbg border border-slate-800 rounded-2xl p-5">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-scale-balanced text-accent"></i> Suivi du Poids (kg)
                     </h2>
-                    <span id="profile-goal-badge" class="bg-sky-500/20 text-sky-300 text-xs px-2.5 py-1 rounded-full font-semibold">Semi 1h35</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div class="bg-cardbg/80 p-3.5 rounded-xl border border-slate-700/50">
-                        <div class="text-slate-400 text-xs uppercase tracking-wider font-medium">Focus Principal</div>
-                        <div id="profile-goal-title" class="font-bold text-white text-base mt-1">Semi-Marathon en 1h35</div>
-                        <div id="profile-goal-sub" class="text-xs text-accent mt-0.5">Allure cible : 4'30"/km + Kettlebell</div>
-                    </div>
-                    <div class="bg-cardbg/80 p-3.5 rounded-xl border border-slate-700/50">
-                        <div class="text-slate-400 text-xs uppercase tracking-wider font-medium">Équipement & Style</div>
-                        <div class="font-bold text-white text-base mt-1">Home Gym / Kettlebell</div>
-                        <div class="text-xs text-accent mt-0.5">Muscu ciblée & Cardio intégré</div>
+                    <form id="weight-form" class="flex gap-3 mb-6">
+                        <input type="number" step="0.1" id="weight-input" placeholder="Ex: 73.5" required
+                            class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white flex-1 focus:outline-none focus:border-accent">
+                        <button type="submit" class="bg-accent hover:bg-accenthover text-darkbg font-bold px-5 py-2.5 rounded-xl transition">
+                            Ajouter
+                        </button>
+                    </form>
+                    <div class="h-48 w-full bg-slate-900/60 rounded-xl border border-slate-800 flex items-center justify-center p-2 relative overflow-hidden">
+                        <canvas id="weight-chart" class="w-full h-full"></canvas>
                     </div>
                 </div>
-            </div>
+                <div class="bg-cardbg border border-slate-800 rounded-2xl p-5">
+                    <h3 class="font-bold text-sm text-slate-400 uppercase tracking-wider mb-3">Historique</h3>
+                    <div id="weight-history" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+                </div>
+            </section>
 
-            <!-- Statistiques rapides -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div class="bg-cardbg p-4 rounded-xl border border-slate-800 text-center">
-                    <div class="text-slate-400 text-xs">Séances Muscu</div>
-                    <div id="stat-muscu" class="text-2xl font-black text-white mt-1">0 / 4</div>
-                </div>
-                <div class="bg-cardbg p-4 rounded-xl border border-slate-800 text-center">
-                    <div class="text-slate-400 text-xs">Sorties Run</div>
-                    <div id="stat-run" class="text-2xl font-black text-white mt-1">0 / 2</div>
-                </div>
-                <div class="bg-cardbg p-4 rounded-xl border border-slate-800 text-center">
-                    <div class="text-slate-400 text-xs">Poids Actuel</div>
-                    <div id="stat-weight" class="text-2xl font-black text-accent mt-1">-- kg</div>
-                </div>
-                <div class="bg-cardbg p-4 rounded-xl border border-slate-800 text-center">
-                    <div class="text-slate-400 text-xs">Jours OFF</div>
-                    <div class="text-2xl font-black text-emerald-400 mt-1">Samedi</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ONGLET 2 : PROGRAMME 7 JOURS -->
-        <section id="tab-program" class="tab-content space-y-4">
-            <div class="flex justify-between items-center mb-2">
-                <h2 class="text-lg font-bold">Programme Hebdomadaire</h2>
-                <button onclick="resetWeekProgress()" class="text-xs text-rose-400 hover:underline">Réinitialiser les cases</button>
-            </div>
-            <div id="program-container" class="space-y-3"></div>
-        </section>
-
-        <!-- ONGLET 3 : SUIVI DU POIDS -->
-        <section id="tab-weight" class="tab-content space-y-6">
-            <div class="bg-cardbg border border-slate-800 rounded-2xl p-5">
-                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-scale-balanced text-accent"></i> Suivi du Poids (kg)
-                </h2>
-                <form id="weight-form" class="flex gap-3 mb-6">
-                    <input type="number" step="0.1" id="weight-input" placeholder="Ex: 73.5" required
-                        class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white flex-1 focus:outline-none focus:border-accent">
-                    <button type="submit" class="bg-accent hover:bg-accenthover text-darkbg font-bold px-5 py-2.5 rounded-xl transition">
-                        Ajouter
-                    </button>
-                </form>
-                <div class="h-48 w-full bg-slate-900/60 rounded-xl border border-slate-800 flex items-center justify-center p-2 relative overflow-hidden">
-                    <canvas id="weight-chart" class="w-full h-full"></canvas>
-                </div>
-            </div>
-            <div class="bg-cardbg border border-slate-800 rounded-2xl p-5">
-                <h3 class="font-bold text-sm text-slate-400 uppercase tracking-wider mb-3">Historique</h3>
-                <div id="weight-history" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
-            </div>
-        </section>
-
-        <!-- ONGLET 4 : CONFIG GITHUB CLOUD -->
-        <section id="tab-settings" class="tab-content space-y-6">
-            <div class="bg-cardbg border border-slate-800 rounded-2xl p-5 space-y-4">
-                <h2 class="text-lg font-bold flex items-center gap-2">
-                    <i class="fa-brands fa-github text-accent"></i> Synchronisation GitHub Cloud
-                </h2>
-                <p class="text-sm text-slate-400">
-                    Sauvegarde tes profils et données automatiquement sur ton dépôt GitHub privé.
-                </p>
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Token d'accès personnel (Personal Access Token)</label>
-                        <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" 
-                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-accent">
+            <!-- CONFIG GITHUB CLOUD -->
+            <section id="tab-settings" class="tab-content space-y-6">
+                <div class="bg-cardbg border border-slate-800 rounded-2xl p-5 space-y-4">
+                    <h2 class="text-lg font-bold flex items-center gap-2">
+                        <i class="fa-brands fa-github text-accent"></i> Synchronisation GitHub Cloud
+                    </h2>
+                    <p class="text-sm text-slate-400">
+                        Sauvegarde tous les profils et comptes utilisateurs sur ton dépôt GitHub privé.
+                    </p>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Token d'accès personnel (Personal Access Token)</label>
+                            <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" 
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-accent">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Nom du dépôt (ex: username/fittracker-data)</label>
+                            <input type="text" id="gh-repo" placeholder="username/repo-name" 
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-accent">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Chemin du fichier JSON</label>
+                            <input type="text" id="gh-path" value="data.json" 
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-accent">
+                        </div>
+                        <button onclick="saveGitHubConfig()" class="w-full bg-accent hover:bg-accenthover text-darkbg font-bold py-3 rounded-xl transition shadow-lg">
+                            Enregistrer & Synchroniser
+                        </button>
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Nom du dépôt (ex: username/fittracker-data)</label>
-                        <input type="text" id="gh-repo" placeholder="username/repo-name" 
-                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-accent">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Chemin du fichier JSON</label>
-                        <input type="text" id="gh-path" value="data.json" 
-                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-accent">
-                    </div>
-                    <button onclick="saveGitHubConfig()" class="w-full bg-accent hover:bg-accenthover text-darkbg font-bold py-3 rounded-xl transition shadow-lg">
-                        Enregistrer & Lancer la synchronisation
-                    </button>
                 </div>
-            </div>
-        </section>
+            </section>
+        </main>
 
-    </main>
-
-    <!-- MODAL GESTION / CRÉATION DE PROFIL -->
-    <div id="profile-modal" class="fixed inset-0 bg-darkbg/95 z-50 hidden flex flex-col p-4 overflow-y-auto">
-        <div class="max-w-md mx-auto w-full bg-cardbg border border-slate-800 rounded-2xl p-6 my-auto space-y-5 shadow-2xl">
-            <div class="flex justify-between items-center">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-users text-accent"></i> Gérer les Profils</h3>
-                <button onclick="closeProfileModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-
-            <div class="space-y-3">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Créer un nouveau profil</h4>
-                <div>
-                    <label class="block text-xs text-slate-300 mb-1">Nom du profil</label>
-                    <input type="text" id="new-profile-name" placeholder="Ex: Prépa Semi & Sèche" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-300 mb-1">Choisir un Objectif / Programme</label>
-                    <select id="new-profile-goal" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
-                        <option value="semi_kettlebell">Semi-Marathon 1h35 & Kettlebell (Actuel)</option>
-                        <option value="seche_abdos">Sèche Extrême & Abdos Tracés</option>
-                        <option value="prise_masse">Prise de Masse & Force (Haltères/Barre)</option>
-                    </select>
-                </div>
-                <button onclick="createProfile()" class="w-full bg-accent hover:bg-accenthover text-darkbg font-bold py-2.5 rounded-xl text-sm transition">
-                    Créer et basculer sur ce profil
+        <!-- Barre de Navigation Inférieure -->
+        <nav class="bg-cardbg border-t border-slate-800 fixed bottom-0 left-0 right-0 z-40">
+            <div class="max-w-4xl mx-auto flex justify-around py-3">
+                <button onclick="switchTab('dashboard')" class="nav-btn flex flex-col items-center text-accent" data-target="dashboard">
+                    <i class="fa-solid fa-chart-pie text-lg"></i>
+                    <span class="text-[10px] mt-1 font-medium">Accueil</span>
+                </button>
+                <button onclick="switchTab('program')" class="nav-btn flex flex-col items-center text-slate-400 hover:text-slate-200" data-target="program">
+                    <i class="fa-solid fa-calendar-days text-lg"></i>
+                    <span class="text-[10px] mt-1 font-medium">Programme</span>
+                </button>
+                <button onclick="switchTab('weight')" class="nav-btn flex flex-col items-center text-slate-400 hover:text-slate-200" data-target="weight">
+                    <i class="fa-solid fa-scale-balanced text-lg"></i>
+                    <span class="text-[10px] mt-1 font-medium">Poids</span>
+                </button>
+                <button onclick="switchTab('settings')" class="nav-btn flex flex-col items-center text-slate-400 hover:text-slate-200" data-target="settings">
+                    <i class="fa-solid fa-cloud text-lg"></i>
+                    <span class="text-[10px] mt-1 font-medium">Cloud</span>
                 </button>
             </div>
+        </nav>
+    </div>
 
-            <div class="border-t border-slate-800 pt-4 space-y-2">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Profils existants</h4>
-                <div id="profile-list-container" class="space-y-2 max-h-36 overflow-y-auto"></div>
+    <!-- MODAL CRÉATION DE COMPTE / PROFIL -->
+    <div id="register-modal" class="fixed inset-0 bg-darkbg/95 z-50 hidden flex flex-col p-4 overflow-y-auto">
+        <div class="max-w-md mx-auto w-full bg-cardbg border border-slate-800 rounded-2xl p-6 my-auto space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-user-plus text-accent"></i> Créer un profil</h3>
+                <button onclick="closeRegisterModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
+
+            <form id="register-form" class="space-y-3" onsubmit="handleRegister(event)">
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">Nom du profil / Titre</label>
+                    <input type="text" id="reg-name" placeholder="Ex: Thomas — Semi & Kettlebell" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">Identifiant (Login)</label>
+                    <input type="text" id="reg-user" placeholder="Ex: thomas" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">Mot de passe</label>
+                    <input type="password" id="reg-pass" placeholder="••••••••" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">Objectif / Programme</label>
+                    <select id="reg-goal" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                        <option value="semi_kettlebell">Semi-Marathon 1h35 & Kettlebell</option>
+                        <option value="seche_abdos">Sèche Extrême & Abdos Tracés</option>
+                        <option value="prise_masse">Prise de Masse & Force</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-accent hover:bg-accenthover text-darkbg font-bold py-2.5 rounded-xl text-sm transition mt-2">
+                    Créer et se connecter
+                </button>
+            </form>
         </div>
     </div>
 
@@ -244,35 +303,12 @@
         </div>
     </div>
 
-    <!-- Barre de Navigation Inférieure -->
-    <nav class="bg-cardbg border-t border-slate-800 fixed bottom-0 left-0 right-0 z-50">
-        <div class="max-w-4xl mx-auto flex justify-around py-3">
-            <button onclick="switchTab('dashboard')" class="nav-btn flex flex-col items-center text-accent" data-target="dashboard">
-                <i class="fa-solid fa-chart-pie text-lg"></i>
-                <span class="text-[10px] mt-1 font-medium">Accueil</span>
-            </button>
-            <button onclick="switchTab('program')" class="nav-btn flex flex-col items-center text-slate-400 hover:text-slate-200" data-target="program">
-                <i class="fa-solid fa-calendar-days text-lg"></i>
-                <span class="text-[10px] mt-1 font-medium">Programme</span>
-            </button>
-            <button onclick="switchTab('weight')" class="nav-btn flex flex-col items-center text-slate-400 hover:text-slate-200" data-target="weight">
-                <i class="fa-solid fa-scale-balanced text-lg"></i>
-                <span class="text-[10px] mt-1 font-medium">Poids</span>
-            </button>
-            <button onclick="switchTab('settings')" class="nav-btn flex flex-col items-center text-slate-400 hover:text-slate-200" data-target="settings">
-                <i class="fa-solid fa-cloud text-lg"></i>
-                <span class="text-[10px] mt-1 font-medium">Cloud</span>
-            </button>
-        </div>
-    </nav>
-
-    <!-- Script Application & Multi-Profils -->
+    <!-- Script Application -->
     <script>
-        // Bibliothèques de programmes selon les objectifs
         const goalTemplates = {
             semi_kettlebell: {
                 title: "Semi-Marathon 1h35 & Kettlebell",
-                sub: "Allure cible : 4'30"/km + Kettlebell haut du corps",
+                sub: "Allure cible : 4'30\"/km + Kettlebell haut du corps",
                 program: [
                     { day: 'Lundi', title: 'Haut du corps (Poussée & Circuit)', type: 'muscu', details: ['Floor Press au Kettlebell (4 x 10)', 'Développé Militaire (3 x 10)', 'Élévations latérales (3 x 12)', 'Circuit Kettlebell Core (3 tours)']},
                     { day: 'Mardi', title: 'Course — Vitesse & Allure Semi', type: 'run', details: ['Échauffement 15 min', 'Blocs : 3 x 2000m à 4\'30"/km', 'Retour au calme 10 min']},
@@ -311,12 +347,13 @@
             }
         };
 
-        // État global multi-profils
         let globalState = {
-            currentProfileId: 'default',
+            activeUser: null,
             profiles: {
-                'default': {
-                    name: 'Mon Profil Principal',
+                'admin': {
+                    name: 'Admin Principal',
+                    username: 'admin',
+                    password: 'password',
                     goal: 'semi_kettlebell',
                     completedWorkouts: {},
                     weights: []
@@ -331,52 +368,113 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             loadLocalState();
-            renderProfileSelect();
-            loadCurrentProfileData();
-            
             if(globalState.settings.token) document.getElementById('gh-token').value = globalState.settings.token;
             if(globalState.settings.repo) document.getElementById('gh-repo').value = globalState.settings.repo;
             if(globalState.settings.path) document.getElementById('gh-path').value = globalState.settings.path;
-
+            
             if(globalState.settings.token && globalState.settings.repo) fetchFromGitHub();
+
+            // Si déjà connecté dans la session
+            if(globalState.activeUser && globalState.profiles[globalState.activeUser]) {
+                showAppView();
+            } else {
+                showAuthView();
+            }
         });
 
+        function showAuthView() {
+            document.getElementById('auth-view').classList.add('active');
+            document.getElementById('app-view').classList.remove('active');
+        }
+
+        function showAppView() {
+            document.getElementById('auth-view').classList.remove('active');
+            document.getElementById('app-view').classList.add('active');
+            loadCurrentProfileData();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('login-user').value.trim().toLowerCase();
+            const pass = document.getElementById('login-pass').value.trim();
+
+            let foundId = null;
+            for(let id in globalState.profiles) {
+                if(globalState.profiles[id].username === user && globalState.profiles[id].password === pass) {
+                    foundId = id;
+                    break;
+                }
+            }
+
+            if(foundId) {
+                globalState.activeUser = foundId;
+                saveLocalState();
+                showAppView();
+            } else {
+                alert("Identifiant ou mot de passe incorrect.");
+            }
+        }
+
+        function logout() {
+            globalState.activeUser = null;
+            saveLocalState();
+            showAuthView();
+        }
+
+        function openRegisterModal() { document.getElementById('register-modal').classList.remove('hidden'); }
+        function closeRegisterModal() { document.getElementById('register-modal').classList.add('hidden'); }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const user = document.getElementById('reg-user').value.trim().toLowerCase();
+            const pass = document.getElementById('reg-pass').value.trim();
+            const goal = document.getElementById('reg-goal').value;
+
+            // Vérifier si le login existe déjà
+            for(let id in globalState.profiles) {
+                if(globalState.profiles[id].username === user) {
+                    return alert("Cet identifiant est déjà pris, choisis-en un autre.");
+                }
+            }
+
+            const newId = 'user_' + Date.now();
+            globalState.profiles[newId] = {
+                name: name,
+                username: user,
+                password: pass,
+                goal: goal,
+                completedWorkouts: {},
+                weights: []
+            };
+
+            globalState.activeUser = newId;
+            saveLocalState();
+            closeRegisterModal();
+            triggerAutoSave();
+            showAppView();
+        }
+
         function getActiveProfile() {
-            return globalState.profiles[globalState.currentProfileId] || globalState.profiles['default'];
+            return globalState.profiles[globalState.activeUser] || globalState.profiles['admin'];
         }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(btn => { btn.classList.remove('text-accent'); btn.classList.add('text-slate-400'); });
-            document.getElementById('tab-' + tabId).classList.add('active');
+            const targetTab = document.getElementById('tab-' + tabId);
+            if(targetTab) targetTab.classList.add('active');
             const activeBtn = document.querySelector(`[data-target="${tabId}"]`);
             if(activeBtn) { activeBtn.classList.add('text-accent'); activeBtn.classList.remove('text-slate-400'); }
             if(tabId === 'weight') drawWeightChart();
-        }
-
-        function renderProfileSelect() {
-            const select = document.getElementById('profile-select');
-            select.innerHTML = '';
-            for(let id in globalState.profiles) {
-                const p = globalState.profiles[id];
-                const opt = document.createElement('option');
-                opt.value = id;
-                opt.innerText = p.name;
-                if(id === globalState.currentProfileId) opt.selected = true;
-                select.appendChild(opt);
-            }
-        }
-
-        function switchProfile(profileId) {
-            globalState.currentProfileId = profileId;
-            loadCurrentProfileData();
-            triggerAutoSave();
         }
 
         function loadCurrentProfileData() {
             const profile = getActiveProfile();
             const template = goalTemplates[profile.goal] || goalTemplates['semi_kettlebell'];
             
+            document.getElementById('header-profile-name').innerText = profile.name;
+            document.getElementById('header-profile-goal').innerText = template.title;
             document.getElementById('profile-goal-badge').innerText = template.title.split('&')[0];
             document.getElementById('profile-goal-title').innerText = template.title;
             document.getElementById('profile-goal-sub').innerText = template.sub;
@@ -385,13 +483,13 @@
             updateDashboardStats();
             renderWeightHistory();
             drawWeightChart();
-            renderProfileListModal();
         }
 
         function renderProgram() {
             const profile = getActiveProfile();
             const template = goalTemplates[profile.goal] || goalTemplates['semi_kettlebell'];
             const container = document.getElementById('program-container');
+            if(!container) return;
             container.innerHTML = '';
 
             template.program.forEach(item => {
@@ -453,59 +551,6 @@
             }
         }
 
-        // Modal Profils
-        function openProfileModal() { document.getElementById('profile-modal').classList.remove('hidden'); renderProfileListModal(); }
-        function closeProfileModal() { document.getElementById('profile-modal').classList.add('hidden'); }
-
-        function renderProfileListModal() {
-            const container = document.getElementById('profile-list-container');
-            container.innerHTML = '';
-            for(let id in globalState.profiles) {
-                const p = globalState.profiles[id];
-                const row = document.createElement('div');
-                row.className = 'flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl text-sm border border-slate-800';
-                row.innerHTML = `
-                    <div>
-                        <div class="font-bold text-white text-xs">${p.name} ${id === globalState.currentProfileId ? '<span class="text-accent">(Actif)</span>' : ''}</div>
-                        <div class="text-[10px] text-slate-400">${(goalTemplates[p.goal] || {}).title || p.goal}</div>
-                    </div>
-                    ${id !== 'default' ? `<button onclick="deleteProfile('${id}')" class="text-rose-400 text-xs hover:text-rose-300"><i class="fa-solid fa-trash"></i></button>` : ''}
-                `;
-                container.appendChild(row);
-            }
-        }
-
-        function createProfile() {
-            const nameInput = document.getElementById('new-profile-name');
-            const goalSelect = document.getElementById('new-profile-goal');
-            const name = nameInput.value.trim();
-            if(!name) return alert("Entre un nom de profil valide");
-
-            const id = 'prof_' + Date.now();
-            globalState.profiles[id] = {
-                name: name,
-                goal: goalSelect.value,
-                completedWorkouts: {},
-                weights: []
-            };
-            nameInput.value = '';
-            globalState.currentProfileId = id;
-            renderProfileSelect();
-            loadCurrentProfileData();
-            closeProfileModal();
-            triggerAutoSave();
-        }
-
-        function deleteProfile(id) {
-            if(confirm("Supprimer ce profil ?")) {
-                delete globalState.profiles[id];
-                globalState.currentProfileId = 'default';
-                renderProfileSelect();
-                loadCurrentProfileData();
-                triggerAutoSave();
-            }
-        }
-
         // Suivi Poids
         document.getElementById('weight-form').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -520,6 +565,7 @@
         function renderWeightHistory() {
             const profile = getActiveProfile();
             const container = document.getElementById('weight-history');
+            if(!container) return;
             container.innerHTML = '';
             if(profile.weights.length === 0) { container.innerHTML = '<p class="text-xs text-slate-500 text-center py-2">Aucune pesée</p>'; return; }
             [...profile.weights].reverse().forEach((w, index) => {
@@ -539,6 +585,7 @@
         function drawWeightChart() {
             const profile = getActiveProfile();
             const canvas = document.getElementById('weight-chart');
+            if(!canvas || !canvas.parentElement) return;
             const ctx = canvas.getContext('2d');
             canvas.width = canvas.parentElement.clientWidth;
             canvas.height = canvas.parentElement.clientHeight;
@@ -635,12 +682,12 @@
             } catch(e) {}
         }
 
-        // Sauvegarde Cloud GitHub
+        // Sauvegarde Cloud & Locale
         function loadLocalState() {
-            const saved = localStorage.getItem('fittracker_global_state');
+            const saved = localStorage.getItem('fittracker_secure_state');
             if(saved) { try { globalState = JSON.parse(saved); } catch(e) {} }
         }
-        function saveLocalState() { localStorage.setItem('fittracker_global_state', JSON.stringify(globalState)); }
+        function saveLocalState() { localStorage.setItem('fittracker_secure_state', JSON.stringify(globalState)); }
 
         function saveGitHubConfig() {
             globalState.settings.token = document.getElementById('gh-token').value.trim();
@@ -667,8 +714,9 @@
                     const data = await res.json();
                     globalState = JSON.parse(atob(data.content));
                     saveLocalState();
-                    renderProfileSelect();
-                    loadCurrentProfileData();
+                    if(globalState.activeUser && globalState.profiles[globalState.activeUser]) {
+                        loadCurrentProfileData();
+                    }
                 } else { pushToGitHub(); }
             } catch(e) {}
         }
@@ -687,7 +735,7 @@
                 await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
                     method: 'PUT',
                     headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: 'FitTracker Multi-Profile Auto-Sync', content: contentB64, sha: sha })
+                    body: JSON.stringify({ message: 'FitTracker Auth Sync', content: contentB64, sha: sha })
                 });
             } catch(e) {}
         }
