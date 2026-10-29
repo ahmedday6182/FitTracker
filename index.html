@@ -38,7 +38,7 @@
                 </div>
                 <div class="flex items-center justify-center gap-2">
                     <h1 class="text-2xl font-black text-white tracking-wide">FitTracker</h1>
-                    <span class="version-badge text-[10px] bg-slate-900/90 text-accent font-mono px-2 py-0.5 rounded-full border border-slate-700/80 font-bold">v2.1.1</span>
+                    <span class="version-badge text-[10px] bg-slate-900/90 text-accent font-mono px-2 py-0.5 rounded-full border border-slate-700/80 font-bold">v2.1.2</span>
                 </div>
             </div>
 
@@ -59,7 +59,7 @@
                     <input type="password" id="login-pass" placeholder="••••••••" required
                         class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-accent">
                 </div>
-                <button type="submit" class="w-full bg-accent hover:bg-accenthover text-darkbg font-extrabold py-3 rounded-xl transition shadow-lg text-sm">
+                <button type="submit" id="login-btn" class="w-full bg-accent hover:bg-accenthover text-darkbg font-extrabold py-3 rounded-xl transition shadow-lg text-sm flex items-center justify-center">
                     Se connecter
                 </button>
             </form>
@@ -78,7 +78,7 @@
                             class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-accent">
                     </div>
                     <div>
-                        <label class="block text-[11px] text-slate-300 mb-1">Personal Access Token (nécessaire uniquement pour enregistrer de nouveaux poids/séances)</label>
+                        <label class="block text-[11px] text-slate-300 mb-1">Personal Access Token (requis uniquement pour créer ou enregistrer de nouvelles données)</label>
                         <input type="password" id="login-gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
                             class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-accent">
                     </div>
@@ -107,7 +107,7 @@
                     <div>
                         <div class="flex items-center gap-2">
                             <h1 class="font-bold text-lg tracking-wide text-white" id="header-profile-name">Profil</h1>
-                            <span class="version-badge text-[9px] bg-slate-900/90 text-accent font-mono px-2 py-0.5 rounded-full border border-slate-700/80 font-semibold">v2.1.1</span>
+                            <span class="version-badge text-[9px] bg-slate-900/90 text-accent font-mono px-2 py-0.5 rounded-full border border-slate-700/80 font-semibold">v2.1.2</span>
                         </div>
                         <p class="text-xs text-accent font-medium" id="header-profile-goal">Objectif</p>
                     </div>
@@ -269,7 +269,7 @@
     </div>
 
     <script>
-        const APP_VERSION = 'v2.1.1';
+        const APP_VERSION = 'v2.1.2';
 
         const goalTemplates = {
             semi_kettlebell: {
@@ -390,47 +390,58 @@
             e.preventDefault();
             hideLoginError();
 
-            const user = document.getElementById('login-user').value.trim().toLowerCase();
-            const pass = document.getElementById('login-pass').value.trim();
+            const btn = document.getElementById('login-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Connexion en cours...';
 
-            if (user === 'admin' && pass === 'password') {
-                currentProfile = {
-                    name: 'Admin Principal',
-                    username: 'admin',
-                    password: 'password',
-                    goal: 'semi_kettlebell',
-                    completedWorkouts: {},
-                    weights: []
-                };
-                saveLocalProfile();
-                showAppView();
-                return;
-            }
+            try {
+                const user = document.getElementById('login-user').value.trim().toLowerCase();
+                const pass = document.getElementById('login-pass').value.trim();
 
-            const response = await fetchProfileFromGitHub(user);
+                if (user === 'admin' && pass === 'password') {
+                    currentProfile = {
+                        name: 'Admin Principal',
+                        username: 'admin',
+                        password: 'password',
+                        goal: 'semi_kettlebell',
+                        completedWorkouts: {},
+                        weights: []
+                    };
+                    saveLocalProfile();
+                    showAppView();
+                    return;
+                }
 
-            if (response.status === 404) {
-                showLoginError(`Fichier introuvable : 'profiles/${user}/data.json'.`);
-                return;
-            }
+                const response = await fetchProfileFromGitHub(user);
 
-            if (response.status === 401 || response.status === 403) {
-                showLoginError("Accès refusé par GitHub (401/403). Ton Token est invalide.");
-                return;
-            }
+                if (response.status === 404) {
+                    showLoginError(`Fichier introuvable sur GitHub : 'profiles/${user}/data.json'.`);
+                    return;
+                }
 
-            if (!response.ok) {
-                showLoginError(`Erreur réseau (${response.status}). Vérifie le nom du dépôt (${config.repo}).`);
-                return;
-            }
+                if (response.status === 401 || response.status === 403) {
+                    showLoginError("Accès refusé par GitHub (401/403). Ton Token est invalide.");
+                    return;
+                }
 
-            const loaded = response.data;
-            if (loaded && loaded.password === pass) {
-                currentProfile = loaded;
-                saveLocalProfile();
-                showAppView();
-            } else {
-                showLoginError("Mot de passe incorrect pour " + user + ".");
+                if (!response.ok) {
+                    showLoginError(`Erreur de connexion (${response.status}). Vérifie le nom du dépôt.`);
+                    return;
+                }
+
+                const loaded = response.data;
+                if (loaded && loaded.password === pass) {
+                    currentProfile = loaded;
+                    saveLocalProfile();
+                    showAppView();
+                } else {
+                    showLoginError("Mot de passe incorrect pour le profil '" + user + "'.");
+                }
+            } catch (err) {
+                showLoginError("Erreur inattendue : " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Se connecter';
             }
         }
 
@@ -633,21 +644,34 @@
 
         async function fetchProfileFromGitHub(username) {
             const repo = config.repo || 'ahmedday6182/fittracker';
-            const headers = {};
-            if (config.token) {
-                headers['Authorization'] = `token ${config.token}`;
-            }
-
+            
+            // 1. Essai direct via raw.githubusercontent.com (Direct, sans API REST, sans Base64)
             try {
-                const url = `https://api.github.com/repos/${repo}/contents/profiles/${username}/data.json?t=${Date.now()}`;
-                const res = await fetch(url, { headers });
-                
-                if(res.ok) {
+                const rawUrl = `https://raw.githubusercontent.com/${repo}/main/profiles/${username}/data.json?t=${Date.now()}`;
+                const rawRes = await fetch(rawUrl);
+                if (rawRes.ok) {
+                    const data = await rawRes.json();
+                    return { ok: true, status: 200, data: data };
+                }
+                if (rawRes.status === 404) {
+                    return { ok: false, status: 404 };
+                }
+            } catch (e) {}
+
+            // 2. Fallback via API REST GitHub si raw échoue
+            try {
+                const headers = {};
+                if (config.token) headers['Authorization'] = `token ${config.token}`;
+                const apiUrl = `https://api.github.com/repos/${repo}/contents/profiles/${username}/data.json?t=${Date.now()}`;
+                const res = await fetch(apiUrl, { headers });
+                if (res.ok) {
                     const data = await res.json();
-                    return { ok: true, status: 200, data: JSON.parse(atob(data.content)) };
+                    const cleanB64 = data.content.replace(/\s/g, '');
+                    const jsonStr = decodeURIComponent(escape(atob(cleanB64)));
+                    return { ok: true, status: 200, data: JSON.parse(jsonStr) };
                 }
                 return { ok: false, status: res.status };
-            } catch(e){
+            } catch (e) {
                 return { ok: false, status: 500 };
             }
         }
