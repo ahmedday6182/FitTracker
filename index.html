@@ -36,8 +36,10 @@
                 <div class="inline-block bg-accent text-darkbg font-extrabold p-3 rounded-2xl text-2xl shadow-lg mb-1">
                     <i class="fa-solid fa-dumbbell"></i>
                 </div>
-                <h1 class="text-2xl font-black text-white tracking-wide">FitTracker</h1>
-                <p class="text-xs text-slate-400">Accès aux profils <code class="text-accent">profiles/&lt;user&gt;/data.json</code></p>
+                <div class="flex items-center justify-center gap-2">
+                    <h1 class="text-2xl font-black text-white tracking-wide">FitTracker</h1>
+                    <span class="version-badge text-[10px] bg-slate-900/90 text-accent font-mono px-2 py-0.5 rounded-full border border-slate-700/80 font-bold">v2.1.1</span>
+                </div>
             </div>
 
             <!-- Message d'erreur dynamique -->
@@ -103,7 +105,10 @@
                         <i class="fa-solid fa-dumbbell"></i>
                     </div>
                     <div>
-                        <h1 class="font-bold text-lg tracking-wide text-white" id="header-profile-name">Profil</h1>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-bold text-lg tracking-wide text-white" id="header-profile-name">Profil</h1>
+                            <span class="version-badge text-[9px] bg-slate-900/90 text-accent font-mono px-2 py-0.5 rounded-full border border-slate-700/80 font-semibold">v2.1.1</span>
+                        </div>
                         <p class="text-xs text-accent font-medium" id="header-profile-goal">Objectif</p>
                     </div>
                 </div>
@@ -264,6 +269,8 @@
     </div>
 
     <script>
+        const APP_VERSION = 'v2.1.1';
+
         const goalTemplates = {
             semi_kettlebell: {
                 title: "Semi-Marathon 1h35 & Kettlebell",
@@ -319,6 +326,8 @@
         let autoSaveTimeout = null;
 
         window.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.version-badge').forEach(el => el.innerText = APP_VERSION);
+            
             loadConfig();
             if(config.token) {
                 document.getElementById('gh-token').value = config.token;
@@ -630,7 +639,6 @@
             }
 
             try {
-                // Ajout d'un paramètre d'horodatage (?t=...) pour éviter la mise en cache par le navigateur
                 const url = `https://api.github.com/repos/${repo}/contents/profiles/${username}/data.json?t=${Date.now()}`;
                 const res = await fetch(url, { headers });
                 
