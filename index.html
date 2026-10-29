@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FitTracker - Semi 1h35 & Kettlebell</title>
+    <title>FitTracker - Multi-Profils & Objectifs</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -38,13 +38,19 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-lg tracking-wide text-white">FitTracker</h1>
-                    <p class="text-xs text-slate-400">Objectif Semi 1h35 & Kettlebell</p>
+                    <select id="profile-select" onchange="switchProfile(this.value)" class="bg-slate-900 text-xs text-accent font-semibold px-2 py-1 rounded-lg border border-slate-700 mt-0.5 focus:outline-none">
+                        <!-- Profils injectés dynamiquement -->
+                    </select>
                 </div>
             </div>
-            <!-- Badge synchro GitHub automatique -->
-            <div id="sync-status" class="flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-700 text-xs">
-                <span id="sync-dot" class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                <span id="sync-text" class="text-slate-300 font-medium">Non configuré</span>
+            <div class="flex items-center gap-3">
+                <button onclick="openProfileModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                    <i class="fa-solid fa-user-gear mr-1"></i> Gérer profils
+                </button>
+                <div id="sync-status" class="hidden sm:flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-700 text-xs">
+                    <span id="sync-dot" class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                    <span id="sync-text" class="text-slate-300 font-medium">Cloud</span>
+                </div>
             </div>
         </div>
     </header>
@@ -57,20 +63,20 @@
             <div class="bg-gradient-to-r from-sky-900/50 to-blue-900/50 border border-sky-500/30 rounded-2xl p-5 shadow-xl">
                 <div class="flex items-center justify-between mb-3">
                     <h2 class="text-lg font-bold text-sky-200 flex items-center gap-2">
-                        <i class="fa-solid fa-bullseye text-accent"></i> Objectifs Actifs
+                        <i class="fa-solid fa-bullseye text-accent"></i> Objectif du Profil
                     </h2>
-                    <span class="bg-sky-500/20 text-sky-300 text-xs px-2.5 py-1 rounded-full font-semibold">Semaine en cours</span>
+                    <span id="profile-goal-badge" class="bg-sky-500/20 text-sky-300 text-xs px-2.5 py-1 rounded-full font-semibold">Semi 1h35</span>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div class="bg-cardbg/80 p-3.5 rounded-xl border border-slate-700/50">
-                        <div class="text-slate-400 text-xs uppercase tracking-wider font-medium">Running</div>
-                        <div class="font-bold text-white text-base mt-1">Semi-Marathon en 1h35</div>
-                        <div class="text-xs text-accent mt-0.5">Allure cible : 4'30"/km</div>
+                        <div class="text-slate-400 text-xs uppercase tracking-wider font-medium">Focus Principal</div>
+                        <div id="profile-goal-title" class="font-bold text-white text-base mt-1">Semi-Marathon en 1h35</div>
+                        <div id="profile-goal-sub" class="text-xs text-accent mt-0.5">Allure cible : 4'30"/km + Kettlebell</div>
                     </div>
                     <div class="bg-cardbg/80 p-3.5 rounded-xl border border-slate-700/50">
-                        <div class="text-slate-400 text-xs uppercase tracking-wider font-medium">Physique</div>
-                        <div class="font-bold text-white text-base mt-1">Haut du corps tracé & Abdos</div>
-                        <div class="text-xs text-accent mt-0.5">Kettlebell + Haltères + Barre fixe</div>
+                        <div class="text-slate-400 text-xs uppercase tracking-wider font-medium">Équipement & Style</div>
+                        <div class="font-bold text-white text-base mt-1">Home Gym / Kettlebell</div>
+                        <div class="text-xs text-accent mt-0.5">Muscu ciblée & Cardio intégré</div>
                     </div>
                 </div>
             </div>
@@ -135,7 +141,7 @@
                     <i class="fa-brands fa-github text-accent"></i> Synchronisation GitHub Cloud
                 </h2>
                 <p class="text-sm text-slate-400">
-                    FitTracker sauvegarde automatiquement tes données sur ton dépôt GitHub privé. Renseigne tes accès :
+                    Sauvegarde tes profils et données automatiquement sur ton dépôt GitHub privé.
                 </p>
                 <div class="space-y-3">
                     <div>
@@ -162,7 +168,41 @@
 
     </main>
 
-    <!-- MODAL / VUE WORKOUT EN DIRECT -->
+    <!-- MODAL GESTION / CRÉATION DE PROFIL -->
+    <div id="profile-modal" class="fixed inset-0 bg-darkbg/95 z-50 hidden flex flex-col p-4 overflow-y-auto">
+        <div class="max-w-md mx-auto w-full bg-cardbg border border-slate-800 rounded-2xl p-6 my-auto space-y-5 shadow-2xl">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-users text-accent"></i> Gérer les Profils</h3>
+                <button onclick="closeProfileModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-3">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Créer un nouveau profil</h4>
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">Nom du profil</label>
+                    <input type="text" id="new-profile-name" placeholder="Ex: Prépa Semi & Sèche" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">Choisir un Objectif / Programme</label>
+                    <select id="new-profile-goal" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                        <option value="semi_kettlebell">Semi-Marathon 1h35 & Kettlebell (Actuel)</option>
+                        <option value="seche_abdos">Sèche Extrême & Abdos Tracés</option>
+                        <option value="prise_masse">Prise de Masse & Force (Haltères/Barre)</option>
+                    </select>
+                </div>
+                <button onclick="createProfile()" class="w-full bg-accent hover:bg-accenthover text-darkbg font-bold py-2.5 rounded-xl text-sm transition">
+                    Créer et basculer sur ce profil
+                </button>
+            </div>
+
+            <div class="border-t border-slate-800 pt-4 space-y-2">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Profils existants</h4>
+                <div id="profile-list-container" class="space-y-2 max-h-36 overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL WORKOUT EN DIRECT -->
     <div id="workout-modal" class="fixed inset-0 bg-darkbg/95 z-50 hidden flex flex-col p-4 overflow-y-auto">
         <div class="max-w-2xl mx-auto w-full flex-1 flex flex-col space-y-4 my-auto">
             <div class="flex justify-between items-center bg-cardbg p-4 rounded-2xl border border-slate-800">
@@ -170,39 +210,34 @@
                     <span id="active-workout-day" class="text-xs font-bold text-accent uppercase">LUNDI</span>
                     <h2 id="active-workout-title" class="text-lg font-bold text-white">Nom de la séance</h2>
                 </div>
-                <button onclick="closeWorkoutMode()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300">
-                    <i class="fa-solid fa-xmark mr-1"></i> Quitter
-                </button>
+                <button onclick="closeWorkoutMode()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300">Quitter</button>
             </div>
 
-            <!-- Timer de Repos Actif Plein Écran -->
             <div id="workout-timer-box" class="bg-cardbg border border-slate-800 rounded-2xl p-6 text-center space-y-2 hidden shadow-2xl">
                 <div class="text-xs uppercase tracking-widest text-accent font-bold">Temps de Repos</div>
                 <div id="workout-timer-display" class="text-5xl font-mono font-black text-white tracking-widest">01:30</div>
                 <div class="flex justify-center gap-2 pt-2">
                     <button onclick="addRestTime(30)" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded-lg">+30s</button>
-                    <button onclick="skipRest()" class="bg-accent/20 hover:bg-accent/30 text-accent text-xs px-3 py-1.5 rounded-lg font-semibold">Passer le repos</button>
+                    <button onclick="skipRest()" class="bg-accent/20 hover:bg-accent/30 text-accent text-xs px-3 py-1.5 rounded-lg font-semibold">Passer</button>
                 </div>
             </div>
 
-            <!-- Carte Exercice Actif -->
             <div id="exercise-card" class="bg-cardbg border border-slate-800 rounded-2xl p-6 space-y-6 flex-1 flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex justify-between items-center text-xs text-slate-400 font-semibold">
-                        <span id="exercise-counter">Exercice 1 sur 4</span>
+                        <span id="exercise-counter">Exercice 1</span>
                         <span id="set-counter" class="bg-slate-800 px-2.5 py-1 rounded-full text-accent">Série 1 / 4</span>
                     </div>
-                    <h3 id="exercise-name" class="text-xl font-bold text-white">Nom de l'exercice</h3>
+                    <h3 id="exercise-name" class="text-xl font-bold text-white">Nom</h3>
                     <p id="exercise-desc" class="text-sm text-slate-300 bg-slate-900/60 p-3.5 rounded-xl border border-slate-800/80">Instructions...</p>
                 </div>
-
                 <div class="space-y-3 pt-4">
-                    <button onclick="completeSet()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-darkbg font-extrabold py-4 rounded-2xl text-base transition shadow-lg flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-check"></i> Valider la série & Lancer le repos (90s)
+                    <button onclick="completeSet()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-darkbg font-extrabold py-4 rounded-2xl text-base transition shadow-lg">
+                        <i class="fa-solid fa-check mr-1"></i> Valider la série & Repos (90s)
                     </button>
                     <div class="flex gap-2">
-                        <button onclick="prevExercise()" class="flex-1 bg-slate-800 hover:bg-slate-700 py-3 rounded-xl text-sm font-semibold transition text-slate-300">Précédent</button>
-                        <button onclick="nextExercise()" class="flex-1 bg-slate-800 hover:bg-slate-700 py-3 rounded-xl text-sm font-semibold transition text-slate-300">Suivant</button>
+                        <button onclick="prevExercise()" class="flex-1 bg-slate-800 hover:bg-slate-700 py-3 rounded-xl text-sm font-semibold text-slate-300">Précédent</button>
+                        <button onclick="nextExercise()" class="flex-1 bg-slate-800 hover:bg-slate-700 py-3 rounded-xl text-sm font-semibold text-slate-300">Suivant</button>
                     </div>
                 </div>
             </div>
@@ -231,67 +266,84 @@
         </div>
     </nav>
 
-    <!-- Script Application -->
+    <!-- Script Application & Multi-Profils -->
     <script>
-        const programData = [
-            { day: 'Lundi', title: 'Haut du corps (Poussée & Circuit)', type: 'muscu', details: [
-                'Floor Press au Kettlebell (4 x 10 reps)',
-                'Développé Militaire au Kettlebell (3 x 8-10 reps/bras)',
-                'Élévations latérales haltères (3 x 12-15 reps)',
-                'Circuit Kettlebell (3 tours) : 10 Dév. militaires, 12 Pompes sur poignées, 15 Russian Twists, 45s Gainage'
-            ]},
-            { day: 'Mardi', title: 'Course à pied — Vitesse & Allure Semi', type: 'run', details: [
-                'Objectif 1h35 (4\'30"/km)',
-                'Échauffement : 15 min footing + gammes',
-                'Blocs : 3 x 2000m à 4\'30"/km',
-                'Retour au calme : 10 min footing lent'
-            ]},
-            { day: 'Mercredi', title: 'Bas du corps — Chaîne Postérieure', type: 'muscu', details: [
-                'Kettlebell Swings (4 x 15-20 reps)',
-                'Goblet Squat au Kettlebell (4 x 12 reps)',
-                'Soulevé de terre roumain Kettlebell (3 x 12 reps)',
-                'Fentes avec Kettlebell (3 x 10 pas/jambe)',
-                'Mollets debout (3 x 20 reps/jambe)'
-            ]},
-            { day: 'Jeudi', title: 'Course à pied — Endurance / Seuil', type: 'run', details: [
-                'Option A : 45-50 min endurance pure (allure 5\'20" - 5\'45"/km)',
-                'Option B : 15 min échauffement + 3 x 6 min au seuil doux (~4\'35"/km) + récup'
-            ]},
-            { day: 'Vendredi', title: 'Haut du corps (Tirage & Circuit)', type: 'muscu', details: [
-                'Tractions sur barre fixe (4 x 8-10 reps)',
-                'Rowing un bras au Kettlebell (3 x 10 reps/bras)',
-                'Kettlebell High Pull (3 x 10 reps)',
-                'Curl Biceps au Kettlebell (3 x 12 reps)',
-                'Circuit Kettlebell (3 tours) : 12 Dead Bugs, 30s Planche latérale, 10 Sit-ups'
-            ]},
-            { day: 'Samedi', title: 'Repos Total (OFF)', type: 'off', details: [
-                'Récupération physique et mentale absolue'
-            ]},
-            { day: 'Dimanche', title: 'Bas du corps — Stabilité & Unilatéral', type: 'muscu', details: [
-                'Squat bulgare (3 x 10 reps/jambe)',
-                'Soulevé de terre roumain unilatéral (3 x 8 reps/jambe)',
-                'Goblet Squat Pulsé (3 x 10 reps)',
-                'Gainage Hollow Body (3 x 30-45s)'
-            ]}
-        ];
+        // Bibliothèques de programmes selon les objectifs
+        const goalTemplates = {
+            semi_kettlebell: {
+                title: "Semi-Marathon 1h35 & Kettlebell",
+                sub: "Allure cible : 4'30"/km + Kettlebell haut du corps",
+                program: [
+                    { day: 'Lundi', title: 'Haut du corps (Poussée & Circuit)', type: 'muscu', details: ['Floor Press au Kettlebell (4 x 10)', 'Développé Militaire (3 x 10)', 'Élévations latérales (3 x 12)', 'Circuit Kettlebell Core (3 tours)']},
+                    { day: 'Mardi', title: 'Course — Vitesse & Allure Semi', type: 'run', details: ['Échauffement 15 min', 'Blocs : 3 x 2000m à 4\'30"/km', 'Retour au calme 10 min']},
+                    { day: 'Mercredi', title: 'Bas du corps — Chaîne Postérieure', type: 'muscu', details: ['Kettlebell Swings (4 x 20)', 'Goblet Squat (4 x 12)', 'Soulevé de terre roumain (3 x 12)', 'Fentes (3 x 10)']},
+                    { day: 'Jeudi', title: 'Course — Endurance / Seuil', type: 'run', details: ['Endurance fondamentale (45-50 min) ou Seuil doux 3x6min']},
+                    { day: 'Vendredi', title: 'Haut du corps (Tirage & Circuit)', type: 'muscu', details: ['Tractions barre fixe (4 x 8)', 'Rowing kettlebell (3 x 10)', 'Curl biceps (3 x 12)', 'Circuit abdos obliques (3 tours)']},
+                    { day: 'Samedi', title: 'Repos Total (OFF)', type: 'off', details: ['Récupération physique et mentale']},
+                    { day: 'Dimanche', title: 'Bas du corps — Stabilité', type: 'muscu', details: ['Squat bulgare (3 x 10)', 'RDL unilatéral (3 x 8)', 'Gainage Hollow Body (3 x 40s)']}
+                ]
+            },
+            seche_abdos: {
+                title: "Sèche Extrême & Abdos Tracés",
+                sub: "Métabolique intense + Déficit & Core focus",
+                program: [
+                    { day: 'Lundi', title: 'Circuit Full Body Kettlebell (MetCon)', type: 'muscu', details: ['Swings lourds (5 x 15)', 'Thrusters kettlebell (4 x 12)', 'Gainage dynamique (4 tours)']},
+                    { day: 'Mardi', title: 'Running — Cardio Long / Calorie Burn', type: 'run', details: ['Footing continu 55 min allure modérée']},
+                    { day: 'Mercredi', title: 'Haut du corps — Poussée & Abdos', type: 'muscu', details: ['Floor press (4 x 12)', 'Pompes inclinées (4 x max)', 'Relevés de jambes suspendu (4 x 15)']},
+                    { day: 'Jeudi', title: 'Running — Fractionné Court (VMA)', type: 'run', details: ['10 x 400m à 90% VMA']},
+                    { day: 'Vendredi', title: 'Haut du corps — Tirage & Core', type: 'muscu', details: ['Tractions (4 x 10)', 'Rowing (4 x 12)', 'Russian twists lestés (4 x 20)']},
+                    { day: 'Samedi', title: 'Repos Total (OFF)', type: 'off', details: ['Repos strict']},
+                    { day: 'Dimanche', title: 'Jambes & Abdos Bas', type: 'muscu', details: ['Goblet squat rapide (4 x 15)', 'Fentes sautées (3 x 10)', 'Planche abdos (5 min cumulées)']}
+                ]
+            },
+            prise_masse: {
+                title: "Prise de Masse & Force",
+                sub: "Charges lourdes, hypertrophie & récupération",
+                program: [
+                    { day: 'Lundi', title: 'Pectoraux & Triceps (Lourd)', type: 'muscu', details: ['Développé incliné haltères/barre (4 x 8)', 'Dips (4 x 10)', 'Élévations latérales (4 x 12)']},
+                    { day: 'Mardi', title: 'Running Léger (Optionnel)', type: 'run', details: ['Footing récup 30 min max']},
+                    { day: 'Mercredi', title: 'Dos & Biceps', type: 'muscu', details: ['Tractions lourd (4 x 6-8)', 'Rowing haltère lourd (4 x 8)', 'Curl EZ (3 x 10)']},
+                    { day: 'Jeudi', title: 'Repos / Mobilité', type: 'off', details: ['Étirements et repos']},
+                    { day: 'Vendredi', title: 'Jambes & Fessiers (Puissance)', type: 'muscu', details: ['Hip Thrust lourd (4 x 10)', 'Goblet squat lourd (4 x 10)', 'Soulevé de terre (4 x 8)']},
+                    { day: 'Samedi', title: 'Épaules & Bras', type: 'muscu', details: ['Développé militaire (4 x 8)', 'Oiseau (3 x 12)', 'Superset biceps/triceps (3 x 12)']},
+                    { day: 'Dimanche', title: 'Repos Total (OFF)', type: 'off', details: ['Repos complet']}
+                ]
+            }
+        };
 
-        let appState = { completedWorkouts: {}, weights: [], settings: { token: '', repo: '', path: 'data.json' } };
+        // État global multi-profils
+        let globalState = {
+            currentProfileId: 'default',
+            profiles: {
+                'default': {
+                    name: 'Mon Profil Principal',
+                    goal: 'semi_kettlebell',
+                    completedWorkouts: {},
+                    weights: []
+                }
+            },
+            settings: { token: '', repo: '', path: 'data.json' }
+        };
+
         let autoSaveTimeout = null;
         let currentWorkout = null, currentExIndex = 0, currentSet = 1, totalSets = 4;
         let workoutRestInterval = null, workoutRestTimeLeft = 0;
 
         window.addEventListener('DOMContentLoaded', () => {
             loadLocalState();
-            renderProgram();
-            updateDashboardStats();
-            renderWeightHistory();
-            drawWeightChart();
-            if(appState.settings.token) document.getElementById('gh-token').value = appState.settings.token;
-            if(appState.settings.repo) document.getElementById('gh-repo').value = appState.settings.repo;
-            if(appState.settings.path) document.getElementById('gh-path').value = appState.settings.path;
-            if(appState.settings.token && appState.settings.repo) fetchFromGitHub();
-            else updateSyncStatus('disconnected', 'Non configuré');
+            renderProfileSelect();
+            loadCurrentProfileData();
+            
+            if(globalState.settings.token) document.getElementById('gh-token').value = globalState.settings.token;
+            if(globalState.settings.repo) document.getElementById('gh-repo').value = globalState.settings.repo;
+            if(globalState.settings.path) document.getElementById('gh-path').value = globalState.settings.path;
+
+            if(globalState.settings.token && globalState.settings.repo) fetchFromGitHub();
         });
+
+        function getActiveProfile() {
+            return globalState.profiles[globalState.currentProfileId] || globalState.profiles['default'];
+        }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -302,15 +354,53 @@
             if(tabId === 'weight') drawWeightChart();
         }
 
+        function renderProfileSelect() {
+            const select = document.getElementById('profile-select');
+            select.innerHTML = '';
+            for(let id in globalState.profiles) {
+                const p = globalState.profiles[id];
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.innerText = p.name;
+                if(id === globalState.currentProfileId) opt.selected = true;
+                select.appendChild(opt);
+            }
+        }
+
+        function switchProfile(profileId) {
+            globalState.currentProfileId = profileId;
+            loadCurrentProfileData();
+            triggerAutoSave();
+        }
+
+        function loadCurrentProfileData() {
+            const profile = getActiveProfile();
+            const template = goalTemplates[profile.goal] || goalTemplates['semi_kettlebell'];
+            
+            document.getElementById('profile-goal-badge').innerText = template.title.split('&')[0];
+            document.getElementById('profile-goal-title').innerText = template.title;
+            document.getElementById('profile-goal-sub').innerText = template.sub;
+
+            renderProgram();
+            updateDashboardStats();
+            renderWeightHistory();
+            drawWeightChart();
+            renderProfileListModal();
+        }
+
         function renderProgram() {
+            const profile = getActiveProfile();
+            const template = goalTemplates[profile.goal] || goalTemplates['semi_kettlebell'];
             const container = document.getElementById('program-container');
             container.innerHTML = '';
-            programData.forEach(item => {
-                const isCompleted = appState.completedWorkouts[item.day] || false;
+
+            template.program.forEach(item => {
+                const isCompleted = profile.completedWorkouts[item.day] || false;
                 const card = document.createElement('div');
                 card.className = `bg-cardbg border rounded-xl p-4 transition ${isCompleted ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-slate-800'}`;
                 let detailsHtml = item.details.map(d => `<li class="text-xs text-slate-300">• ${d}</li>`).join('');
                 let actionBtn = item.type === 'muscu' ? `<button onclick="startWorkoutMode('${item.day}')" class="bg-accent hover:bg-accenthover text-darkbg font-bold text-xs px-3 py-1.5 rounded-lg transition shadow"><i class="fa-solid fa-play mr-1"></i> Séance</button>` : '';
+                
                 card.innerHTML = `
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center gap-3">
@@ -331,8 +421,150 @@
             });
         }
 
+        function toggleWorkout(day) {
+            const profile = getActiveProfile();
+            profile.completedWorkouts[day] = !profile.completedWorkouts[day];
+            renderProgram(); updateDashboardStats(); triggerAutoSave();
+        }
+
+        function resetWeekProgress() {
+            if(confirm("Réinitialiser les cases de la semaine ?")) {
+                getActiveProfile().completedWorkouts = {};
+                renderProgram(); updateDashboardStats(); triggerAutoSave();
+            }
+        }
+
+        function updateDashboardStats() {
+            const profile = getActiveProfile();
+            const template = goalTemplates[profile.goal] || goalTemplates['semi_kettlebell'];
+            let muscuCount = 0, runCount = 0;
+            template.program.forEach(item => {
+                if(profile.completedWorkouts[item.day]) {
+                    if(item.type === 'muscu') muscuCount++;
+                    if(item.type === 'run') runCount++;
+                }
+            });
+            document.getElementById('stat-muscu').innerText = `${muscuCount} / 4`;
+            document.getElementById('stat-run').innerText = `${runCount} / 2`;
+            if(profile.weights.length > 0) {
+                document.getElementById('stat-weight').innerText = profile.weights[profile.weights.length - 1].weight + ' kg';
+            } else {
+                document.getElementById('stat-weight').innerText = '-- kg';
+            }
+        }
+
+        // Modal Profils
+        function openProfileModal() { document.getElementById('profile-modal').classList.remove('hidden'); renderProfileListModal(); }
+        function closeProfileModal() { document.getElementById('profile-modal').classList.add('hidden'); }
+
+        function renderProfileListModal() {
+            const container = document.getElementById('profile-list-container');
+            container.innerHTML = '';
+            for(let id in globalState.profiles) {
+                const p = globalState.profiles[id];
+                const row = document.createElement('div');
+                row.className = 'flex justify-between items-center bg-slate-900 px-3 py-2 rounded-xl text-sm border border-slate-800';
+                row.innerHTML = `
+                    <div>
+                        <div class="font-bold text-white text-xs">${p.name} ${id === globalState.currentProfileId ? '<span class="text-accent">(Actif)</span>' : ''}</div>
+                        <div class="text-[10px] text-slate-400">${(goalTemplates[p.goal] || {}).title || p.goal}</div>
+                    </div>
+                    ${id !== 'default' ? `<button onclick="deleteProfile('${id}')" class="text-rose-400 text-xs hover:text-rose-300"><i class="fa-solid fa-trash"></i></button>` : ''}
+                `;
+                container.appendChild(row);
+            }
+        }
+
+        function createProfile() {
+            const nameInput = document.getElementById('new-profile-name');
+            const goalSelect = document.getElementById('new-profile-goal');
+            const name = nameInput.value.trim();
+            if(!name) return alert("Entre un nom de profil valide");
+
+            const id = 'prof_' + Date.now();
+            globalState.profiles[id] = {
+                name: name,
+                goal: goalSelect.value,
+                completedWorkouts: {},
+                weights: []
+            };
+            nameInput.value = '';
+            globalState.currentProfileId = id;
+            renderProfileSelect();
+            loadCurrentProfileData();
+            closeProfileModal();
+            triggerAutoSave();
+        }
+
+        function deleteProfile(id) {
+            if(confirm("Supprimer ce profil ?")) {
+                delete globalState.profiles[id];
+                globalState.currentProfileId = 'default';
+                renderProfileSelect();
+                loadCurrentProfileData();
+                triggerAutoSave();
+            }
+        }
+
+        // Suivi Poids
+        document.getElementById('weight-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const val = parseFloat(document.getElementById('weight-input').value);
+            if(!isNaN(val)) {
+                getActiveProfile().weights.push({ date: new Date().toISOString().split('T')[0], weight: val });
+                document.getElementById('weight-input').value = '';
+                renderWeightHistory(); drawWeightChart(); updateDashboardStats(); triggerAutoSave();
+            }
+        });
+
+        function renderWeightHistory() {
+            const profile = getActiveProfile();
+            const container = document.getElementById('weight-history');
+            container.innerHTML = '';
+            if(profile.weights.length === 0) { container.innerHTML = '<p class="text-xs text-slate-500 text-center py-2">Aucune pesée</p>'; return; }
+            [...profile.weights].reverse().forEach((w, index) => {
+                const realIndex = profile.weights.length - 1 - index;
+                const row = document.createElement('div');
+                row.className = 'flex justify-between items-center bg-slate-900/60 px-3 py-2 rounded-lg text-sm border border-slate-800';
+                row.innerHTML = `<span class="text-slate-400 text-xs">${w.date}</span><span class="font-bold text-white">${w.weight} kg</span><button onclick="deleteWeight(${realIndex})" class="text-rose-400 text-xs"><i class="fa-solid fa-trash"></i></button>`;
+                container.appendChild(row);
+            });
+        }
+
+        function deleteWeight(index) {
+            getActiveProfile().weights.splice(index, 1);
+            renderWeightHistory(); drawWeightChart(); updateDashboardStats(); triggerAutoSave();
+        }
+
+        function drawWeightChart() {
+            const profile = getActiveProfile();
+            const canvas = document.getElementById('weight-chart');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if(profile.weights.length < 2) {
+                ctx.fillStyle = '#64748b'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText('Ajoute au moins 2 pesées', canvas.width/2, canvas.height/2);
+                return;
+            }
+            const weights = profile.weights.map(w => w.weight);
+            const minW = Math.min(...weights) - 1, maxW = Math.max(...weights) + 1;
+            const padding = 30, w = canvas.width, h = canvas.height;
+            ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2.5; ctx.beginPath();
+            profile.weights.forEach((item, i) => {
+                const x = padding + (i / (profile.weights.length - 1)) * (w - 2 * padding);
+                const y = h - padding - ((item.weight - minW) / (maxW - minW)) * (h - 2 * padding);
+                if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+        }
+
+        // Mode Workout
         function startWorkoutMode(dayName) {
-            currentWorkout = programData.find(p => p.day === dayName);
+            const profile = getActiveProfile();
+            const template = goalTemplates[profile.goal];
+            currentWorkout = template.program.find(p => p.day === dayName);
             if(!currentWorkout) return;
             currentExIndex = 0; currentSet = 1; totalSets = 4;
             document.getElementById('active-workout-day').innerText = currentWorkout.day;
@@ -343,15 +575,12 @@
             updateWorkoutUI();
         }
 
-        function closeWorkoutMode() {
-            document.getElementById('workout-modal').classList.add('hidden');
-            clearInterval(workoutRestInterval);
-        }
+        function closeWorkoutMode() { document.getElementById('workout-modal').classList.add('hidden'); clearInterval(workoutRestInterval); }
 
         function updateWorkoutUI() {
             const exercises = currentWorkout.details;
             const currentEx = exercises[currentExIndex] || "Fin";
-            document.getElementById('exercise-counter').innerText = `Exercice ${currentExIndex + 1} sur ${exercises.length}`;
+            document.getElementById('exercise-counter').innerText = `Exercice ${currentExIndex + 1} / ${exercises.length}`;
             document.getElementById('set-counter').innerText = `Série ${currentSet} / ${totalSets}`;
             document.getElementById('exercise-name').innerText = currentEx.split('(')[0].trim();
             document.getElementById('exercise-desc').innerText = currentEx;
@@ -359,13 +588,12 @@
 
         function completeSet() {
             startWorkoutRest(90);
-            if(currentSet < totalSets) {
-                currentSet++;
-            } else {
+            if(currentSet < totalSets) { currentSet++; }
+            else {
                 if(currentExIndex < currentWorkout.details.length - 1) { currentExIndex++; currentSet = 1; }
                 else {
-                    alert("Séance terminée avec brio !");
-                    appState.completedWorkouts[currentWorkout.day] = true;
+                    alert("Séance terminée ! Bravo !");
+                    getActiveProfile().completedWorkouts[currentWorkout.day] = true;
                     renderProgram(); updateDashboardStats(); triggerAutoSave(); closeWorkoutMode();
                     return;
                 }
@@ -373,12 +601,8 @@
             updateWorkoutUI();
         }
 
-        function nextExercise() {
-            if(currentExIndex < currentWorkout.details.length - 1) { currentExIndex++; currentSet = 1; updateWorkoutUI(); }
-        }
-        function prevExercise() {
-            if(currentExIndex > 0) { currentExIndex--; currentSet = 1; updateWorkoutUI(); }
-        }
+        function nextExercise() { if(currentExIndex < currentWorkout.details.length - 1) { currentExIndex++; currentSet = 1; updateWorkoutUI(); } }
+        function prevExercise() { if(currentExIndex > 0) { currentExIndex--; currentSet = 1; updateWorkoutUI(); } }
 
         function startWorkoutRest(seconds) {
             clearInterval(workoutRestInterval);
@@ -411,135 +635,46 @@
             } catch(e) {}
         }
 
-        function toggleWorkout(day) {
-            appState.completedWorkouts[day] = !appState.completedWorkouts[day];
-            renderProgram(); updateDashboardStats(); triggerAutoSave();
-        }
-
-        function resetWeekProgress() {
-            if(confirm("Réinitialiser ?")) { appState.completedWorkouts = {}; renderProgram(); updateDashboardStats(); triggerAutoSave(); }
-        }
-
-        function updateDashboardStats() {
-            let muscuCount = 0, runCount = 0;
-            programData.forEach(item => {
-                if(appState.completedWorkouts[item.day]) {
-                    if(item.type === 'muscu') muscuCount++;
-                    if(item.type === 'run') runCount++;
-                }
-            });
-            document.getElementById('stat-muscu').innerText = `${muscuCount} / 4`;
-            document.getElementById('stat-run').innerText = `${runCount} / 2`;
-            if(appState.weights.length > 0) {
-                document.getElementById('stat-weight').innerText = appState.weights[appState.weights.length - 1].weight + ' kg';
-            } else {
-                document.getElementById('stat-weight').innerText = '-- kg';
-            }
-        }
-
-        document.getElementById('weight-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const val = parseFloat(document.getElementById('weight-input').value);
-            if(!isNaN(val)) {
-                appState.weights.push({ date: new Date().toISOString().split('T')[0], weight: val });
-                document.getElementById('weight-input').value = '';
-                renderWeightHistory(); drawWeightChart(); updateDashboardStats(); triggerAutoSave();
-            }
-        });
-
-        function renderWeightHistory() {
-            const container = document.getElementById('weight-history');
-            container.innerHTML = '';
-            if(appState.weights.length === 0) { container.innerHTML = '<p class="text-xs text-slate-500 text-center py-2">Aucune pesée</p>'; return; }
-            [...appState.weights].reverse().forEach((w, index) => {
-                const realIndex = appState.weights.length - 1 - index;
-                const row = document.createElement('div');
-                row.className = 'flex justify-between items-center bg-slate-900/60 px-3 py-2 rounded-lg text-sm border border-slate-800';
-                row.innerHTML = `<span class="text-slate-400 text-xs">${w.date}</span><span class="font-bold text-white">${w.weight} kg</span><button onclick="deleteWeight(${realIndex})" class="text-rose-400 text-xs"><i class="fa-solid fa-trash"></i></button>`;
-                container.appendChild(row);
-            });
-        }
-
-        function deleteWeight(index) {
-            appState.weights.splice(index, 1);
-            renderWeightHistory(); drawWeightChart(); updateDashboardStats(); triggerAutoSave();
-        }
-
-        function drawWeightChart() {
-            const canvas = document.getElementById('weight-chart');
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if(appState.weights.length < 2) {
-                ctx.fillStyle = '#64748b'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
-                ctx.fillText('Ajoute au moins 2 pesées', canvas.width/2, canvas.height/2);
-                return;
-            }
-            const weights = appState.weights.map(w => w.weight);
-            const minW = Math.min(...weights) - 1, maxW = Math.max(...weights) + 1;
-            const padding = 30, w = canvas.width, h = canvas.height;
-            ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2.5; ctx.beginPath();
-            appState.weights.forEach((item, i) => {
-                const x = padding + (i / (appState.weights.length - 1)) * (w - 2 * padding);
-                const y = h - padding - ((item.weight - minW) / (maxW - minW)) * (h - 2 * padding);
-                if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-            });
-            ctx.stroke();
-        }
-
+        // Sauvegarde Cloud GitHub
         function loadLocalState() {
-            const saved = localStorage.getItem('fittracker_state');
-            if(saved) { try { appState = JSON.parse(saved); } catch(e) {} }
+            const saved = localStorage.getItem('fittracker_global_state');
+            if(saved) { try { globalState = JSON.parse(saved); } catch(e) {} }
         }
-        function saveLocalState() { localStorage.setItem('fittracker_state', JSON.stringify(appState)); }
+        function saveLocalState() { localStorage.setItem('fittracker_global_state', JSON.stringify(globalState)); }
 
         function saveGitHubConfig() {
-            appState.settings.token = document.getElementById('gh-token').value.trim();
-            appState.settings.repo = document.getElementById('gh-repo').value.trim();
-            appState.settings.path = document.getElementById('gh-path').value.trim() || 'data.json';
+            globalState.settings.token = document.getElementById('gh-token').value.trim();
+            globalState.settings.repo = document.getElementById('gh-repo').value.trim();
+            globalState.settings.path = document.getElementById('gh-path').value.trim() || 'data.json';
             saveLocalState(); fetchFromGitHub();
-        }
-
-        function updateSyncStatus(status, text) {
-            const dot = document.getElementById('sync-dot'), txt = document.getElementById('sync-text');
-            txt.innerText = text;
-            dot.className = "w-2.5 h-2.5 rounded-full animate-pulse ";
-            if(status === 'synced') dot.classList.add('bg-emerald-500');
-            else if(status === 'saving') dot.classList.add('bg-amber-500');
-            else if(status === 'error') dot.classList.add('bg-rose-500');
-            else dot.classList.add('bg-slate-500');
         }
 
         function triggerAutoSave() {
             saveLocalState();
-            if(!appState.settings.token || !appState.settings.repo) return;
+            if(!globalState.settings.token || !globalState.settings.repo) return;
             clearTimeout(autoSaveTimeout);
-            updateSyncStatus('saving', 'Sauvegarde...');
             autoSaveTimeout = setTimeout(() => pushToGitHub(), 1500);
         }
 
         async function fetchFromGitHub() {
-            const { token, repo, path } = appState.settings;
+            const { token, repo, path } = globalState.settings;
             if(!token || !repo) return;
-            updateSyncStatus('saving', 'Chargement...');
             try {
                 const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
                     headers: { 'Authorization': `token ${token}` }
                 });
                 if(res.ok) {
                     const data = await res.json();
-                    const jsonContent = JSON.parse(atob(data.content));
-                    appState.completedWorkouts = jsonContent.completedWorkouts || {};
-                    appState.weights = jsonContent.weights || [];
-                    saveLocalState(); renderProgram(); updateDashboardStats(); renderWeightHistory(); drawWeightChart();
-                    updateSyncStatus('synced', 'Synchronisé');
+                    globalState = JSON.parse(atob(data.content));
+                    saveLocalState();
+                    renderProfileSelect();
+                    loadCurrentProfileData();
                 } else { pushToGitHub(); }
-            } catch(e) { updateSyncStatus('error', 'Erreur synchro'); }
+            } catch(e) {}
         }
 
         async function pushToGitHub() {
-            const { token, repo, path } = appState.settings;
+            const { token, repo, path } = globalState.settings;
             if(!token || !repo) return;
             try {
                 let sha = null;
@@ -548,19 +683,13 @@
                 });
                 if(getRes.ok) { const fileData = await getRes.json(); sha = fileData.sha; }
 
-                const contentB64 = btoa(unescape(encodeURIComponent(JSON.stringify({
-                    completedWorkouts: appState.completedWorkouts, weights: appState.weights
-                }, null, 2))));
-
-                const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+                const contentB64 = btoa(unescape(encodeURIComponent(JSON.stringify(globalState, null, 2))));
+                await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
                     method: 'PUT',
                     headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: 'FitTracker Auto-Sync', content: contentB64, sha: sha })
+                    body: JSON.stringify({ message: 'FitTracker Multi-Profile Auto-Sync', content: contentB64, sha: sha })
                 });
-
-                if(putRes.ok) updateSyncStatus('synced', 'Synchronisé');
-                else updateSyncStatus('error', 'Échec push');
-            } catch(e) { updateSyncStatus('error', 'Erreur réseau'); }
+            } catch(e) {}
         }
     </script>
 </body>
